@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Choice.init({
     description: DataTypes.STRING,
-    seq: DataTypes.NUMBER,
-    question_id: DataTypes.NUMBER,
-    score: DataTypes.NUMBER
+    seq: DataTypes.INTEGER,
+    question_id: DataTypes.INTEGER,
+    score: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Choice',

@@ -15,10 +15,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Question.init({
     description: DataTypes.STRING,
-    seq: DataTypes.NUMBER,
+    seq: DataTypes.INTEGER,
     destroyed: DataTypes.BOOLEAN,
     is_multi: DataTypes.BOOLEAN,
-    part_id: DataTypes.NUMBER,
+    part_id: DataTypes.INTEGER,
     img_src: DataTypes.TEXT
   }, {
     sequelize,

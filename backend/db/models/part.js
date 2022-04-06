@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     description: DataTypes.STRING,
     destroyed: DataTypes.BOOLEAN,
-    domain_id: DataTypes.NUMBER
+    domain_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Part',

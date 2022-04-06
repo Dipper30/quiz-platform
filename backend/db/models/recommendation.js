@@ -14,9 +14,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Recommendation.init({
-    show_under: DataTypes.NUMBER,
+    show_under: DataTypes.INTEGER,
     link: DataTypes.STRING,
-    part_id: DataTypes.NUMBER
+    part_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Recommendation',

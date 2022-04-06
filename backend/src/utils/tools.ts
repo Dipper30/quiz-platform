@@ -2,12 +2,17 @@ import BaseException from '../exception/BaseException'
 import moment from 'moment'
 
 const crypto = require('crypto')
-import keys from '../config/key'
+import { keys } from '../config'
 
 const attrs: string[] = [
   'createdAt',
   'updatedAt',
 ]
+
+export const isObject = (obj: any): Boolean => Object.prototype.toString.call(obj) == '[object Object]'
+
+export const isArray = (arr: any): Boolean => Object.prototype.toString.call(arr) == '[object Array]'
+
 
 /**
  * check if the element is contained in Enum's value
@@ -24,11 +29,11 @@ export const enumIncludes = (enumType: any, el: any): Boolean => Object.values(e
  * @returns data after filtering
  */
 export const omitFields = (rawData: any, attrsToOmit: string[] = attrs): ThisType<any> => {
-  if (!rawData) return rawData
-  rawData = JSON.parse(JSON.stringify(rawData))
+  
+  if (!rawData || (!isArray(rawData) && !isObject(rawData))) return rawData
   // check data type
-  if (rawData instanceof Array) {
-    return rawData.map(data => {
+  if (isArray(rawData)) {
+    return rawData.map((data: any) => {
       Object.keys(data).forEach(attr => {
         if (attrsToOmit.includes(attr)) delete data[attr]
       })

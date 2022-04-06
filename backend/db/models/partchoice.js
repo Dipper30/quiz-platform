@@ -16,8 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   PartChoice.init({
     description: DataTypes.STRING,
     show_sub: DataTypes.BOOLEAN,
-    seq: DataTypes.NUMBER,
-    part_id: DataTypes.NUMBER
+    seq: DataTypes.INTEGER,
+    part_id: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'PartChoice',

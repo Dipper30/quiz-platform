@@ -15,10 +15,10 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       seq: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       part_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

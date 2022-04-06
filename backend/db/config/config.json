@@ -1,10 +1,13 @@
 {
   "development": {
     "username": "root",
-    "password": "db123456",
+    "password": "dipper123456",
     "database": "quiz-db",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "dialectOptions": {
+      "socketPath": "/tmp/mysql.sock"
+    }
   },
   "test": {
     "username": "root",

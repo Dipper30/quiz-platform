@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       seq: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       destroyed: {
         type: Sequelize.BOOLEAN
@@ -21,7 +21,7 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       part_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       img_src: {
         type: Sequelize.TEXT

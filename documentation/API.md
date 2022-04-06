@@ -48,11 +48,12 @@
             {
               description: String,
               willShowSubQuestions: Boolean,
+              seq: Number,
             }
           ],
           recommendations: [
             {
-              score: Number,
+              showUnder: Number,
               link: String,
             }
           ]

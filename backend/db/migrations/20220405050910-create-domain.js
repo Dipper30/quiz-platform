@@ -12,10 +12,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       proportion: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       quiz_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

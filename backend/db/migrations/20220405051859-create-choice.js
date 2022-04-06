@@ -12,13 +12,13 @@ module.exports = {
         type: Sequelize.STRING
       },
       seq: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       question_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       score: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

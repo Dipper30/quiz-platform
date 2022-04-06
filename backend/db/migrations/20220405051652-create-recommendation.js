@@ -9,13 +9,13 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       show_under: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       link: {
         type: Sequelize.STRING
       },
       part_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

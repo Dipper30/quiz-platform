@@ -37,19 +37,19 @@ A CMS platform will be provided.
             {
               // if the user scores less than or equal to 25% of the total points of this part,
               // he/she will be provided by the following link
-              "score": 25, 
+              "showUnder": 25, 
               "link": "https://www.google.com"
             },
             {
-              "score": 50,
+              "showUnder": 50,
               "link": "https://www.google.com"
             },
             {
-              "score": 75,
+              "showUnder": 75,
               "link": "https://www.google.com"
             },
             {
-              "score": 100,
+              "showUnder": 100,
               "link": "https://www.google.com"
             },
           ]
@@ -132,7 +132,7 @@ IF NOT EXISTS Parts (# eg. Python, R
 	id INT NOT NULL PRIMARY KEY,
 	NAME VARCHAR ( 255 ),
 	description VARCHAR ( 255 ),# descriptions for the Quiz
-	detroyed boolean NOT NULL,
+	destroyed boolean NOT NULL,
 	createAt CHAR ( 10 ),# 10-digit unix TIMESTAMP
 	updateAt CHAR ( 10 ),
 	domain_id INT NOT NULL,
@@ -147,7 +147,7 @@ CREATE TABLE
 IF NOT EXISTS PartChoices ( # eg. Python, R
 	id INT NOT NULL PRIMARY KEY,
 	description VARCHAR(255),
-	showSub boolean, # show sub questions if clicked
+	show_sub boolean, # show sub questions if clicked
 	seq INT, # sequence number eg: A B C
 	createAt char(10), # 10-digit unix TIMESTAMP
 	updateAt char(10),
