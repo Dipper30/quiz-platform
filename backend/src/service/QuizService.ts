@@ -1,9 +1,10 @@
 import BaseService from "./BaseService"
 import { Op } from 'sequelize'
-import { Choice, InitQuiz, Question } from "../types"
+import { GetQuiz, Choice, Domain, InitQuiz, Question, Part } from "../types"
 import { ParameterException, QuizException } from "../exception"
 import { errCode } from "../config"
 import { isEmptyValue, omitFields } from "../utils/tools"
+import { domainToASCII } from "url"
 
 const models = require('../../db/models/index.js')
 const { sequelize } = require('../../db/models')
@@ -35,11 +36,10 @@ class Quiz extends BaseService {
         tag: data.tag ?? '',
         description: data.description ?? '',
         total_points: data.total_points,
-        destroyed: true,
+        destroyed: false,
       })
 
       const qid = newQuiz.id
-      console.log('quiz id', newQuiz.id)
 
       // create domains
       const newDomains = await DomainModel.bulkCreate(
@@ -50,7 +50,6 @@ class Quiz extends BaseService {
         })
       ))
 
-      console.log('new domains', newDomains)
       newDomains.map((d: any) => console.log(d.name))
 
       // create parts
@@ -148,8 +147,6 @@ class Quiz extends BaseService {
         question.seq = seq
       }
 
-      
-
       if (!isEmptyValue(description)) question.description = description
       if (!isEmptyValue(isMulti)) question.is_multi = isMulti
       if (!isEmptyValue(imgSrc)) question.img_src = imgSrc
@@ -179,7 +176,6 @@ class Quiz extends BaseService {
     try {
       const { description, seq, questionId, score } = data
       const ifQuestionExists = await QuestionModel.findByPk(questionId)
-      console.log(ifQuestionExists);
       
       if (!ifQuestionExists) throw new QuizException(errCode.QUIZ_ERROR, 'Question does not exist.')
 
@@ -249,6 +245,66 @@ class Quiz extends BaseService {
         { where: { id } },
       )
       return Boolean(deleted)
+    } catch (error) {
+      return error
+    }
+  }
+
+  async getQuizById (data: { id: Number }, showDestroyed: Boolean = false) {
+    try {
+      const { id } = data
+      const quizModel = await QuizModel.findByPk(id)
+      if (!quizModel || (!showDestroyed && quizModel.destroyed == true)) throw new QuizModel(errCode.QUIZ_ERROR, 'Quiz Not Found.')
+
+      const quiz: GetQuiz = omitFields(quizModel.dataValues, ['destroyed'], true)
+
+      const domainModels = await DomainModel.findAll({
+        where: { quiz_id: quiz.id },
+      })
+
+      // append domains to quiz
+      quiz.domains = domainModels?.map((domain: any) => omitFields(domain.dataValues, ['destroyed'], true)) || []
+      
+      // append parts to each domain
+      for (const domain of quiz.domains) {
+        const partModels = await PartModel.findAll({
+          where: { domain_id: domain.id },
+        })
+        domain.parts = partModels.map((part: any) => omitFields(part.dataValues, ['destroyed'], true)) || []
+        for (const part of domain.parts) {
+          // append choices and recommendations to each part
+          const partChoiceModels = await PartChoiceModel.findAll({
+            where: { part_id: part.id }
+          })
+          const recommendationModels = await RecommendationModel.findAll({
+            where: { part_id: part.id }
+          })
+          part.choices = partChoiceModels?.map((partChocie: any) => omitFields(partChocie.dataValues, ['destroyed'], true)) || []
+          part.recommendations = recommendationModels?.map((recommendation: any) => omitFields(recommendation.dataValues, ['destroyed'], true)) || []
+        }
+      }
+      
+      return quiz
+    } catch (error) {
+      return error
+    }
+  }
+
+  /**
+   * get quiz by id, including deleted quiz
+   * @param data 
+   * @returns quiz
+   */
+  async getQuizByIdWithAuth (data: { id: Number }) {
+    try {
+      const { id } = data
+      const quiz = await QuizModel.findByPk(id)
+      if (!quiz) throw new QuizModel(errCode.QUIZ_ERROR, 'Quiz Not Found.')
+      console.log(omitFields(quiz.dataValues, ['detroyed'], true))
+      quiz.dataValues = omitFields(quiz.dataValues, ['detroyed'], true)
+      console.log(quiz.dataValues)
+
+      return quiz
     } catch (error) {
       return error
     }

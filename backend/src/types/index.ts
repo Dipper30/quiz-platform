@@ -5,17 +5,20 @@ export interface Choice {
 }
 
 export interface Recommendation {
+  id?: Number,
   showUnder: Number,
   link: String,
 }
 
 export interface Part {
+  id?: Number,
   partName: String,
   choices: Choice[],
   recommendations: Recommendation[],
 }
 
 export interface Domain {
+  id?: Number,
   domainName: String,
   proportion: Number,
   parts: Part[],
@@ -44,4 +47,13 @@ export interface Choice {
   description: String,
   questionId: Number,
   score: Number,
+}
+
+export interface GetQuiz {
+  id?: Number,
+  title: String,
+  tag: String,
+  description: String,
+  total_points: Number,
+  domains: Domain[],
 }

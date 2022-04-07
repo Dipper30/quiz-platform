@@ -97,6 +97,23 @@ class Quiz extends BaseController {
     }
   }
 
+  async getQuizById (req: any, res: any, next: any): Promise<any> {
+    try {
+      const data: { id: Number } = req.params
+      const quiz = await QuizService.getQuizById(data)
+
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          quiz,
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
 }
 
 export default new Quiz()

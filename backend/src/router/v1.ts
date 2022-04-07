@@ -21,4 +21,6 @@ router.post('/deleteQuestion', QuizController.deleteQuestion)
 router.post('/choice', QuizController.createOrUpdateChoice)
 router.post('/deleteChoice', QuizController.deleteChoice)
 
+router.get('/quiz/:id', QuizController.getQuizById)
+
 module.exports = router
