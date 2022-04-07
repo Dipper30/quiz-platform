@@ -94,7 +94,7 @@
           title: String,
           tag?: String,
           description: String,
-          total_points: Number,
+          totalPoints: Number,
           domains: [
             {
               domainName: String,
@@ -171,15 +171,15 @@
           id: Number,
           description: String,
           seq: Number,
-          multi_choices: Boolean,
-          part_id: Number,
-          img_src: String | NULL,
+          isMulti: Boolean,
+          partId: Number,
+          imgSrc: String | NULL,
           choices: [
             {
               id: Number,
               seq: Number,
               description: String,
-              question_id: Number,
+              questionId: Number,
               score?: Number, // this field should be invisible to users
             }
           ]
@@ -204,9 +204,9 @@
     id?: Number, // if undefined, new question will be added, otherwise rewrite
     description: String,
     seq: Number, // if rewrite, validate the sequence
-    multi_choices: Boolean, // indicates if user can select more than one choices
-    part_id: Number,
-    img_src: String | NULL,
+    isMulti: Boolean, // indicates if user can select more than one choices
+    partId: Number,
+    imgSrc: String | NULL,
   },
   header: {
     token: String,
@@ -215,7 +215,13 @@
     code: 201,
     msg: 'ok',
     data: {
-      id: Number,
+      quiz: {
+        id: Number,
+        description: String,
+        seq: Number,
+        is_multi: Boolean,
+        part_id: Number,
+      },
     }
   },
   return_fail: {
@@ -239,10 +245,8 @@
   },
   return_ok: {
     code: 201,
-    msg: 'ok',
-    data: {
-      id: Number,
-    }
+    msg: 'deleted',
+    data: null,
   },
   return_fail: {
     code: ,
@@ -261,7 +265,7 @@
     id?: Number, // if undefined, new choice will be added, otherwise rewrite
     seq: Number, // if rewrite, validate the sequence
     description: String,
-    question_id: Number,
+    questionId: Number,
     score: Number,
   },
   header: {
@@ -271,7 +275,13 @@
     code: 201,
     msg: 'ok',
     data: {
-      id: Number,
+      choice: {
+        id: Number,
+        seq: Number,
+        description: String,
+        questionId: Number,
+        score: Number,
+      }
     }
   },
   return_fail: {

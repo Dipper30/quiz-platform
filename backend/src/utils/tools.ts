@@ -26,11 +26,14 @@ export const enumIncludes = (enumType: any, el: any): Boolean => Object.values(e
  * to filter unwanted fields in an array or an object
  * @param {object} rawData data that needs filtering
  * @param {string[]} attrsToOmit attributes that are unwanted
+ * @param {boolean} includingTS automatically delete 'createdAt' and 'updatedAt'
  * @returns data after filtering
  */
-export const omitFields = (rawData: any, attrsToOmit: string[] = attrs): ThisType<any> => {
+export const omitFields = (rawData: any, attrsToOmit: string[] = attrs, includingTS: Boolean = false): typeof rawData => {
   
   if (!rawData || (!isArray(rawData) && !isObject(rawData))) return rawData
+  if (includingTS) attrsToOmit = [ ...attrsToOmit, 'createdAt', 'updatedAt' ]
+  
   // check data type
   if (isArray(rawData)) {
     return rawData.map((data: any) => {
@@ -144,3 +147,10 @@ export const generateDateByTs = (ts?: number|undefined): String => {
   if (!ts) ts = getTS()
   return moment(ts).format('YYMMDDhhmmss')
 }
+
+/**
+ * if v is null or undefined, return true
+ * @param v 
+ * @returns 
+ */
+export const isEmptyValue = (v: any): Boolean => v === null || v === undefined

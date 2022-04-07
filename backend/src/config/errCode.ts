@@ -20,9 +20,7 @@ enum errCode {
   USER_EXISTS = 60001,
 
   // chatroom
-  CHATROOM_ERROR = 70000,
-  CHATROOM_ALREADY_EXISTS = 70001,
-  CHATROOM_NOT_FOUND = 70004,
+  QUIZ_ERROR = 70001,
 
   // file error code
   FILE_ERROR = 80000,

@@ -20,6 +20,9 @@ module.exports = {
       score: {
         type: Sequelize.INTEGER
       },
+      destroyed: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -28,3 +28,20 @@ export interface InitQuiz {
   total_points: Number,
   domains: Domain[],
 }
+
+export interface Question {
+  id?: Number,
+  description: String,
+  seq: Number, // if rewrite, validate the sequence
+  isMulti: Boolean, // indicates if user can select more than one choices
+  partId: Number,
+  imgSrc: String | null,
+}
+
+export interface Choice {
+  id?: Number,
+  seq: Number,
+  description: String,
+  questionId: Number,
+  score: Number,
+}

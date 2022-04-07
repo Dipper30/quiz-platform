@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.STRING,
     seq: DataTypes.INTEGER,
     question_id: DataTypes.INTEGER,
-    score: DataTypes.INTEGER
+    score: DataTypes.INTEGER,
+    destroyed: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'Choice',
