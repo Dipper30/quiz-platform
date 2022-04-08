@@ -2,37 +2,49 @@ import { AccountInfo } from '../types/User'
 
 const jwt = require('jsonwebtoken')
 import { keys } from '../config'
+import { isEmptyValue } from '../utils/tools'
 
 class Token {
 
-  data: any
-
-  constructor (data: any) {
-    this.data = data
-  }
-
-  generateToken () {
-    const data: { userID: number, username: string } = this.data
-    // const created = Math.floor(Date.now() / 1000)
-    
-    let token = jwt.sign({ ...data }, keys.TOKEN_PRIVATE_KEY, { expiresIn: keys.TOKEN_EXPIRE_IN })
+  /**
+   * generate token by user id and username
+   * @param { userID: number, username: string } dataToEncript 
+   * @returns String
+   */
+  generateToken (dataToEncript: { userID: number, username: string }): String {
+    let token = jwt.sign({ ...dataToEncript }, keys.TOKEN_PRIVATE_KEY, { expiresIn: keys.TOKEN_EXPIRE_IN })
     return token
   }
 
-  verifyToken (authPoint?: number|undefined): any {
-    const token = this.data
+  verifyToken (token: String | Number | undefined, requiredAuth?: Number): Boolean {
+    if (isEmptyValue(token)) return false
     try {
-      const res: { userID: number, username: any, iat: any, exp: number} = jwt.verify(token, keys.TOKEN_PRIVATE_KEY) || {}
-      const { userID, username, iat, exp = 0 } = res
+      const res: { userID: Number, auth: Number[], iat: Number, exp: Number } = jwt.verify(token, keys.TOKEN_PRIVATE_KEY) || {}
+      const { userID, auth, iat, exp = 0 } = res
       const current = Math.floor(Date.now() / 1000)
       // if current timestamp is larger than the expire time, return false
       if (current > exp) return false
-      // if (authPoint && !auth.includes(authPoint)) return false
-      return res
+      if (requiredAuth && !auth.includes(requiredAuth)) return false
+      return true
     } catch (error) {
       return false
     }
   }
+
+  veryTokenWithID (token: String | Number | undefined, requiredAuth?: Number): Number {
+    if (isEmptyValue(token)) return 0
+    try {
+      const res: { userID: Number, auth: Number[], iat: Number, exp: Number } = jwt.verify(token, keys.TOKEN_PRIVATE_KEY) || {}
+      const { userID, auth, iat, exp = 0 } = res
+      const current = Math.floor(Date.now() / 1000)
+      // if current timestamp is larger than the expire time, return false
+      if (current > exp) return 0
+      if (requiredAuth && !auth.includes(requiredAuth)) return 0
+      return userID
+    } catch (error) {
+      return 0
+    }
+  }
 }
 
-export default Token
+export default new Token()

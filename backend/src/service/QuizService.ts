@@ -290,21 +290,34 @@ class Quiz extends BaseService {
     }
   }
 
-  /**
-   * get quiz by id, including deleted quiz
-   * @param data 
-   * @returns quiz
-   */
-  async getQuizByIdWithAuth (data: { id: Number }) {
+  async getQuestions (data: { pid: Number }, withAuth: Boolean = false, showDestroyed: Boolean = false) {
     try {
-      const { id } = data
-      const quiz = await QuizModel.findByPk(id)
-      if (!quiz) throw new QuizModel(errCode.QUIZ_ERROR, 'Quiz Not Found.')
-      console.log(omitFields(quiz.dataValues, ['detroyed'], true))
-      quiz.dataValues = omitFields(quiz.dataValues, ['detroyed'], true)
-      console.log(quiz.dataValues)
+      const { pid } = data
+      const questionModels = await QuestionModel.findAll({
+        where: { part_id: pid, destroyed: false }
+      })
 
-      return quiz
+      const questions: Question[] = questionModels?.map((question: any) => omitFields(question.dataValues, ['destroyed'], true)) || []
+      console.log(questions)
+      // append choices to each question
+      for (const question of questions) {
+        const choiceModels = await ChoiceModel.findAll({
+          where: { question_id: question.id, destroyed: false },
+        })
+        const fieldsToOmit = withAuth ? ['destroyed'] : ['destroyed', 'score']
+        question.choices = choiceModels?.map((choice: any) => omitFields(choice.dataValues, fieldsToOmit, true)) || []
+      }
+
+      return questions
+    } catch (error) {
+      return error
+    }
+  }
+
+  async getQuestionsWithAuth (data: { pid: Number }, showDestroyed: Boolean = false) {
+    try {
+      const { pid } = data
+      // const questions =       
     } catch (error) {
       return error
     }

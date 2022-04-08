@@ -6,7 +6,7 @@ import {
 } from '../controller'
 
 import {
-  AuthValidator,
+  AuthValidator, QuizValidator,
 } from '../validator'
 
 const router: Router = Router()
@@ -14,13 +14,19 @@ const router: Router = Router()
 // login
 router.post('/login', AuthValidator.checkLogin, AuthController.login)
 
-// quiz
-router.post('/initQuiz', QuizController.initQuiz)
+// update quiz
+router.post('/initQuiz', QuizValidator.checkInitQuiz, QuizController.initQuiz)
 router.post('/question', QuizController.createOrUpdateQuestion)
 router.post('/deleteQuestion', QuizController.deleteQuestion)
 router.post('/choice', QuizController.createOrUpdateChoice)
 router.post('/deleteChoice', QuizController.deleteChoice)
 
-router.get('/quiz/:id', QuizController.getQuizById)
+// requests from users: hiding attributes such as 'score'
+router.get('/questions', QuizController.getQuestions)
+
+// requests from admin: show detailed attribute
+router.get('/quiz/:id', QuizValidator.checkGetQuiz, QuizController.getQuizById)
+router.get('/questions', QuizController.getQuestions)
+router.get('/questionsDetail', QuizController.getQuestionsWithAuth)
 
 module.exports = router

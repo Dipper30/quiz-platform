@@ -39,6 +39,7 @@ export interface Question {
   isMulti: Boolean, // indicates if user can select more than one choices
   partId: Number,
   imgSrc: String | null,
+  choices?: Choice[],
 }
 
 export interface Choice {

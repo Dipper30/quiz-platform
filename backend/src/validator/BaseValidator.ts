@@ -1,5 +1,6 @@
 const validator = require('validator')
 
+import MyValidator from './MyValidator'
 import { Validator } from '../types/common'
 import { queryIsNull } from '../utils/tools'
 import { ParameterException } from '../exception'
@@ -10,12 +11,12 @@ class BaseValidator implements Validator {
   params: any
   stringIsDigit: RegExp = /^\d+$/ // check if the string consists of numbers
 
-  constructor (params: any) {
-    this.params = params
-  }
-
   createError (msg: string = 'Parameter Error'): ParameterException {
     return new ParameterException(errCode.PARAMETER_ERROR, msg)
+  }
+
+  validate (data: any) {
+    return new MyValidator(data)
   }
 
   // 'continue' will not work in a for of loop
@@ -211,4 +212,4 @@ class BaseValidator implements Validator {
 
 }
 
-module.exports = BaseValidator
+export default BaseValidator

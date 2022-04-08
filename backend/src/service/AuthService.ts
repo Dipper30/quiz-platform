@@ -15,7 +15,7 @@ class Auth extends BaseService {
     super()
   }
 
-  async findAccountByUserID (uid: number): Promise<any> {
+  async findAccountByUserID (uid: Number): Promise<any> {
     try {
       const hasAccount = await UserModel.findByPk(uid)
       // const hasAccount = await UserModel.findOne({
@@ -27,7 +27,7 @@ class Auth extends BaseService {
     }
   }
 
-  async ifHasAccount (uid: number): Promise<any> {
+  async ifHasAccount (uid: Number): Promise<any> {
     try {
       const user = await UserModel.findByPk(uid)
       if (!user) return false

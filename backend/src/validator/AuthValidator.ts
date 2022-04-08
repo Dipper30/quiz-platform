@@ -1,4 +1,4 @@
-const BaseValidator = require('./BaseValidator')
+import BaseValidator from './BaseValidator'
 import { isBetween, createError } from '../utils/validate'
 import v from 'validator'
 
@@ -12,10 +12,6 @@ class AuthValidator extends BaseValidator {
     'password|string|required',
     'id|number',
   ]
-
-  constructor () {
-    super()
-  }
 
   checkAuthParam (): Boolean {
     if (!this.checkParams(this.params, this.rules)) return false

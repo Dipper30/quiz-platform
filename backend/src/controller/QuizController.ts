@@ -1,7 +1,11 @@
-import QuizService from "../service/QuizService";
-import { Choice, InitQuiz, Question } from "../types";
-import { isEmptyValue, isError } from "../utils/tools";
-import BaseController from "./BaseController";
+import { pid } from "process"
+import {
+  TokenService,
+  QuizService,
+} from "../service"
+import { Choice, InitQuiz, Question } from "../types"
+import { isEmptyValue, isError } from "../utils/tools"
+import BaseController from "./BaseController"
 
 class Quiz extends BaseController {
 
@@ -107,6 +111,49 @@ class Quiz extends BaseController {
         msg: 'ok',
         data: {
           quiz,
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * get questions by part id 
+   */
+  async getQuestions (req: any, res: any, next: any): Promise<any> {
+    try {
+
+      const { token } = req.headers
+      const isValidToken = TokenService.verifyToken(token)
+
+      const data: { pid: Number } = req.query
+      const questions = await QuizService.getQuestions(data, isValidToken)
+
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          partId: pid,
+          questions,
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getQuestionsWithAuth (req: any, res: any, next: any): Promise<any> {
+    try {
+      const data: { pid: Number } = req.query
+      const questions = await QuizService.getQuestions(data)
+
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          partId: pid,
+          questions,
         }
       })
     } catch (error) {

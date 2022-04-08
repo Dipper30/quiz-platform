@@ -154,3 +154,9 @@ export const generateDateByTs = (ts?: number|undefined): String => {
  * @returns 
  */
 export const isEmptyValue = (v: any): Boolean => v === null || v === undefined
+
+/**
+ */
+export const withAuth = (req: any, auth?: Number): Boolean => {
+  return req.token
+}
