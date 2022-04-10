@@ -1,4 +1,5 @@
-import { isEmptyValue } from "../utils/tools"
+
+import { isArray, isString, isEmptyValue, isNumber } from "../utils/tools"
 import { isBetween, isNumeric } from "../utils/validate"
 
 class MyValidator {
@@ -33,20 +34,20 @@ class MyValidator {
     return this
   }
 
-  isArray () {
-    const fn = () => Object.prototype.toString.call(this.#data) === '[object Array]'
+  Array () {
+    const fn = () => isArray(this.#data)
     this.#taskList.push(fn)
     return this
   }
 
-  isString () {
-    const fn = () => Object.prototype.toString.call(this.#data) === '[object String]'
+  String () {
+    const fn = () => isString(this.#data)
     this.#taskList.push(fn)
     return this
   }
 
-  isNumber () {
-    const fn = () => Object.prototype.toString.call(this.#data) === '[object Number]'
+  Number () {
+    const fn = () => isNumber(this.#data)
     this.#taskList.push(fn)
     return this
   }

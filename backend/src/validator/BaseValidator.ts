@@ -6,7 +6,7 @@ import { queryIsNull } from '../utils/tools'
 import { ParameterException } from '../exception'
 import { errCode } from '../config'
 
-class BaseValidator implements Validator {
+class BaseValidator {
 
   params: any
   stringIsDigit: RegExp = /^\d+$/ // check if the string consists of numbers
@@ -17,112 +17,6 @@ class BaseValidator implements Validator {
 
   validate (data: any) {
     return new MyValidator(data)
-  }
-
-  // 'continue' will not work in a for of loop
-  // use 'for' here
-  checkParams (params: any, rules: string[]): Boolean {
-    // 遍历每一个属性名的规则
-    for (let i = 0; i < rules.length; i++) {
-      const single_rule = rules[i]
-      // 将rule字符串转成数组
-      let single_rule_arr: string[] = single_rule.split('|')
-      const key = single_rule_arr[0]
-      const type = single_rule_arr[1]
-      // 当指定参数名不存在时，优先校验required属性
-      if ( !params.hasOwnProperty(key) ) {
-        if ( single_rule_arr.includes('required') ) return false
-        else continue
-      } else {
-        // 此时请求参数中存在规则内的属性名
-        // 判断是否可以为空值
-        if ( single_rule_arr.includes('allowNull') && params[key] == null ) {
-          continue
-        }
-        switch (type) {
-          case 'number': 
-            if ( typeof params[key] != 'number' ) return false
-            break
-          case 'string': 
-            if ( typeof params[key] != 'string' ) return false
-            break
-          case 'boolean': 
-            if ( params[key] != false && params[key] != true ) return false
-            break
-          case 'date':
-            if ( !validator.isDate(params[key]) ) return false
-            break
-          case 'array':
-            if (!Array.isArray(params[key])) return false
-            break
-          case 'timestamp':
-            if ( !this.isTimeStamp(params[key]) ) return false
-            break
-          case 'unixTimestamp':
-            if ( !this.isUnixTimeStamp(params[key]) ) return false
-            break
-          default:
-            break
-        }
-      }
-    }
-    return true
-  }
-
-  /**
-   * check for queries where all values are string
-   * @param {any} params query, which is typeof string 
-   * @param {string[]} rules
-   * @returns A modified query, numerics converted into int, boolean values converted into Boolean
-   */
-  // 
-  checkQuery (params: any, rules: string[]): any {
-    if (!params) return {}
-    // 遍历每一个属性名的规则
-    for (let i = 0; i < rules.length; i++) {
-      const single_rule = rules[i]
-      // 将rule字符串转成数组
-      let single_rule_arr: string[] = single_rule.split('|')
-      const key = single_rule_arr[0]
-      const type = single_rule_arr[1]
-      // 当指定参数名不存在时，优先校验required属性
-      if ( !params.hasOwnProperty(key) ) {
-        if ( single_rule_arr.includes('required') ) return false
-        else continue
-      } else {
-        // 此时请求参数中存在规则内的属性名
-        // 判断是否可以为空值
-        if ( single_rule_arr.includes('allowNull') && queryIsNull(params[key]) ) {
-          continue
-        }
-        switch (type) {
-          case 'number': 
-            if ( typeof params[key] != 'number' && !this.stringIsNumeric(params[key]) ) return false
-            params[key] = Number(params[key])
-            break
-          case 'string': 
-            if ( typeof params[key] != 'string' ) return false
-            break
-          case 'boolean': 
-            if ( !validator.isBoolean(params[key]) && this.stringIsBoolean(params[key]) ) return false
-            params[key] = params[key] == 'false' ? false : true
-            break
-          case 'timestamp':
-            if ( !this.stringIsNumeric(params[key]) ) return false
-            params[key] = Number(params[key])
-            if ( !this.isTimeStamp(params[key]) ) return false
-            break
-          case 'unixTimestamp':
-            if ( !this.stringIsNumeric(params[key]) ) return false
-            params[key] = Number(params[key])
-            if ( !this.isUnixTimeStamp(params[key]) ) return false
-            break
-          default:
-            break
-        }
-      }
-    }
-    return params
   }
 
   isPositiveInteger (n: any): Boolean {

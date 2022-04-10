@@ -9,9 +9,13 @@ const attrs: string[] = [
   'updatedAt',
 ]
 
-export const isObject = (obj: any): Boolean => Object.prototype.toString.call(obj) == '[object Object]'
+export const isObject = (obj: any): boolean => Object.prototype.toString.call(obj) == '[object Object]'
 
-export const isArray = (arr: any): Boolean => Object.prototype.toString.call(arr) == '[object Array]'
+export const isArray = (arr: any): boolean => Object.prototype.toString.call(arr) == '[object Array]'
+
+export const isString = (str: any): boolean => Object.prototype.toString.call(str) == '[object String]'
+
+export const isNumber = (num: any): boolean => Object.prototype.toString.call(num) == '[object Number]'
 
 
 /**
@@ -154,9 +158,3 @@ export const generateDateByTs = (ts?: number|undefined): String => {
  * @returns 
  */
 export const isEmptyValue = (v: any): Boolean => v === null || v === undefined
-
-/**
- */
-export const withAuth = (req: any, auth?: Number): Boolean => {
-  return req.token
-}

@@ -77,15 +77,23 @@ export const isNumeric = (data: any) => {
   return stringIsDigit.test(data)
 }
 
+export const isObject = (obj: any): boolean => Object.prototype.toString.call(obj) == '[object Object]'
+
+export const isArray = (arr: any): boolean => Object.prototype.toString.call(arr) == '[object Array]'
+
+export const isString = (str: any): boolean => Object.prototype.toString.call(str) == '[object String]'
+
+export const isNumber = (num: any): boolean => Object.prototype.toString.call(num) == '[object Number]'
+
 /**
  * check if the number is between min and max
  * or check if the length of string is between min and max
  */
 export const isBetween = (data: any, leftBound: number, rightBound: number, withLeft: boolean = true, withRight: boolean = true) => {
   try {
-    if (typeof data === 'string') {
-      return (withLeft ? Number(data) >= leftBound : Number(data) > leftBound)
-        && (withRight ? Number(data) <= rightBound : Number(data) > rightBound)
+    if (typeof data === 'string') {      
+      return (withLeft ? data.length >= leftBound : data.length > leftBound)
+        && (withRight ? data.length <= rightBound : data.length > rightBound)
     } else if (typeof data === 'number') {
       return (withLeft ? data >= leftBound : data > leftBound)
         && (withRight ? data <= rightBound : data > rightBound)
