@@ -5,6 +5,9 @@ import { Provider } from 'react-redux'
 import store from './store'
 import Router from './routes'
 
+console.log('@@!!!', import.meta.url)
+
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>

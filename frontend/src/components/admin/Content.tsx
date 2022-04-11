@@ -1,7 +1,7 @@
 import ContentHeader from "./ContentHeader"
 
 type ContentProps = {
-  breadcrumb: string
+  breadcrumb: string | null
 }
 
 const Content: React.FC<ContentProps> = (props) => {

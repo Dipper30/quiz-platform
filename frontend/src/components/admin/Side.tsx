@@ -9,12 +9,7 @@ type MenuItem = {
 }
 
 type SideProp = {
-  updateBreadCrumb: (str: string) => void
-}
-
-const breadcrumbConfig: any = {
-  'home': 1,
-  'new': 2,
+  updateBreadCrumb: (str: string | null) => void
 }
 
 const Side: React.FC<SideProp> = (props) => {
@@ -27,7 +22,7 @@ const Side: React.FC<SideProp> = (props) => {
     const currentPage = s[s.length - 1]
     const currentConfig = sideConfig.find(page => page.path == currentPage)
     setSelectedIndex(currentConfig?.index || 1)
-    props.updateBreadCrumb(currentConfig?.title || '')
+    props.updateBreadCrumb(currentConfig ? currentConfig.title : (currentPage == 'admin' ? ' Home' : null))
   }, [])
 
   return (

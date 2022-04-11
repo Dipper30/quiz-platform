@@ -9,14 +9,14 @@ type LayoutProps = {
 
 const Layout: React.FC<LayoutProps> = (props) => {
 
-  const [breadcrumb, setBreadcrumb] = useState('Admin')
+  const [breadcrumb, setBreadcrumb] = useState<string | null>('Home')
 
 
 
   return (
     <div className="admin-layout-container">
       <Header />
-      <Side updateBreadCrumb={() => (str: string) => setBreadcrumb(str)} />
+      <Side updateBreadCrumb={(str: string | null) => setBreadcrumb(str)} />
       <Content breadcrumb={breadcrumb}>{ props.children }</Content>
     </div>
   )

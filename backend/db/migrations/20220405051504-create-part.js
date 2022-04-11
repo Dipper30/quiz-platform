@@ -20,6 +20,9 @@ module.exports = {
       domain_id: {
         type: Sequelize.INTEGER
       },
+      seq: {
+        type: Sequelize.INTEGER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

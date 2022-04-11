@@ -11,6 +11,9 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      seq: {
+        type: Sequelize.INTEGER
+      },
       proportion: {
         type: Sequelize.INTEGER
       },

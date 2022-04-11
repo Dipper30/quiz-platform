@@ -13,12 +13,14 @@ export interface Recommendation {
 export interface Part {
   id?: Number,
   partName: String,
+  seq: number,
   choices: Choice[],
   recommendations: Recommendation[],
 }
 
 export interface Domain {
   id?: Number,
+  seq: number,
   domainName: String,
   proportion: Number,
   parts: Part[],

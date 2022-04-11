@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Part.init({
     name: DataTypes.STRING,
     description: DataTypes.STRING,
+    seq: DataTypes.INTEGER,
     destroyed: DataTypes.BOOLEAN,
     domain_id: DataTypes.INTEGER
   }, {

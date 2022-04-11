@@ -1,12 +1,22 @@
 type ContentHeaderProps = {
-  breadcrumb: string
+  breadcrumb: string | null
 }
 
 const ContentHeader: React.FC<ContentHeaderProps> = (props) => {
   return (
-    <div className="admin-content-header-container">
-      { 'Admin / ' + props.breadcrumb }
-    </div>
+    <>
+      {
+        props.breadcrumb ?
+          (
+            <div className="admin-content-header-container">
+              { `Admin / ` } <span style={{color: '#1890ff'}}>{ `${props.breadcrumb}` }</span>
+            </div>
+          )
+        : <div></div>
+      }
+    </>
+    
+    
   )
 }
 

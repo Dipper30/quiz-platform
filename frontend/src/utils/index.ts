@@ -72,3 +72,33 @@ export const warningMessage = (msg: string) => {
 export const getLocalStorage = (key: string) => localStorage.getItem(key)
 
 export const setLocalStorage = (key: string, value: string) => localStorage.setItem(key, value)
+
+export const isObject = (obj: any): boolean => {
+  return Object.prototype.toString.call(obj) == '[object Object]'
+}
+
+export const isArray = (arr: any): boolean => {
+  return Object.prototype.toString.call(arr) == '[object Array]'
+}
+
+export const deepClone: (<T>(obj: T) => T) = (obj) => {
+  if (!isObject(obj) && !isArray(obj)) {
+    return obj
+  }
+  if (isArray(obj)) {
+    const arr: any = []
+    for (let o of (obj as any)) {
+      arr.push(deepClone(o))
+    }
+    return arr
+  }
+  if (isObject(obj)) {
+    const o: any = {}
+    for (let key in obj) {
+      o[key] = deepClone(obj[key])
+    }
+    return o
+  }
+  return obj
+}
+

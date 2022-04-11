@@ -12,7 +12,7 @@ class QuizValidator extends BaseValidator {
 
   checkInitQuiz (req: any, res: any, next: any) {
     try {
-      
+      next()
     } catch (error) {
       next(error)
     }

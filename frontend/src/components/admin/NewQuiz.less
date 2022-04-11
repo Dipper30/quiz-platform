@@ -1,5 +1,157 @@
-@import "../../index.less";
+@import "@/index.less";
 
 .admin-newquiz-container {
+  width: 100%;
+  .init-quiz-container {
+    .input-item {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: baseline;
+      margin: 20px 0;
+      .label {
+        color: #333;
+        margin-right: 20px;
+        .error {
+          color: red;
+        }
+        .ok {
+          color: green;
+        }
+      }
+      .input-wrapper {
+ 
+      }
+      &.text-area {
+        align-items: flex-start;
+        .input-wrapper {
+          width: 400px;
+        }
+      }
+    }
+  }
+  .input-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin-bottom: 20px;
+    .label {
+      color: #333;
+      margin-right: 20px;
+      .error {
+        color: red;
+      }
+      .ok {
+        color: green;
+      }
+    }
+    .input-wrapper {
+
+    }
+    &.text-area {
+      align-items: flex-start;
+      .input-wrapper {
+        width: 400px;
+      }
+    }
+  }
+  .add-domain-container {
+    .domain-list {
+      padding-left: 30px;
+    }
+    .label {
+      color: #333;
+      margin-right: 20px;
+      .error {
+        color: red;
+      }
+      .ok {
+        color: green;
+      }
+    }
+  }
+  .delete-btn {
+    margin-left: 20px;
+    // font-size: 16px;
+    color: red;
+  }
+  .add-btn {
+    margin-left: 20px;
+    font-size: 16px;
+    color: @blue;
+  }
+  .icon-btn {
+    position: absolute;
+    top: 7px;
+    right: -25px;
+    cursor: pointer;
+  }
   
+  .section-divider {
+    color: #333;
+    background-color: #ccc;
+    width: fit-content;
+    border-radius: 5px;
+    padding: 4px 10px;
+    margin-bottom: 20px;
+    position: relative;
+    .error {
+      color: red;
+    }
+    .ok {
+      color: green;
+    }
+  }
+}
+
+.error {
+  .ant-input-number {
+    color: red;
+  }
+}
+
+.admin-domain-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  transition: 0.4s ease;
+  overflow: hidden;
+  &.expanded {
+    height: auto;
+  }
+  &.collapsed {
+    height: 150px;
+  }
+}
+
+.admin-sequence-container {
+  width: 50px;
+  height: 30px;
+  margin-right: 20px;
+  .ant-input-number {
+    width: 50px;
+  }
+  .seq {
+    line-height: 30px;
+  }
+}
+
+.admin-part-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.admin-partchoice-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 10px;
 }

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import vitePluginImp from 'vite-plugin-imp'
+import { ViteAliases } from 'vite-aliases'
 
 const path = require('path')
 
@@ -17,17 +18,13 @@ export default defineConfig({
           style: (name) => `antd/es/${name}/style`
         }
       ]
-    })
+    }),
+    ViteAliases(),
   ],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    }
-  },
   css: {
     preprocessorOptions: {
       less: {
-        javascriptEnabled: true, // 支持内联 JavaScript
+        javascriptEnabled: true,
       }
     }
   },

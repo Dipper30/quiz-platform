@@ -42,8 +42,10 @@
       {
         domainName: String,
         proportion: Number,
+        seq: Number,
         parts: [
           partName: String,
+          seq: Number,
           choices: [
             {
               description: String,

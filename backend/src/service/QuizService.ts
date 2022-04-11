@@ -46,6 +46,7 @@ class Quiz extends BaseService {
         domains.map(domain => ({
           name: domain.domainName,
           proportion: domain.proportion,
+          seq: domain.seq,
           quiz_id: qid,
         })
       ))
@@ -58,6 +59,7 @@ class Quiz extends BaseService {
         const newParts = await PartModel.bulkCreate(
           parts.map(part => ({
             name: part.partName,
+            seq: part.seq,
             destroyed: false,
             domain_id: domain.id,
           }))
