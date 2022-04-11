@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useEffect, useState } from 'react'
-import './login.less'
+import './Login.less'
 import api from '../http'
 import { setUser } from '../store/actions/user'
 // import { userReducer } from '../store/reducers'
 import { connect } from 'react-redux'
-import { handleResult } from '../utils' 
+import { handleResult, setLocalStorage } from '../utils' 
 import { useNavigate } from 'react-router-dom'
 
 const Login: React.FC = (props: any) => {
@@ -30,11 +30,11 @@ const Login: React.FC = (props: any) => {
     }
     const res: any = await api.login(p)
     if (handleResult(res)) {
-      props.setUser(res.data.user)
-      localStorage.setItem('token', res.data.token)
-      localStorage.setItem('uid', res.data.user.id)
-      // go to chatroom
-      navigate('/entry')
+      const { data } = res
+      props.setUser(data.user)
+      setLocalStorage('token', data.token)
+      setLocalStorage('uid', data.user.id)
+      navigate('/admin')
     }
     setLock(false)
     clearTimeout(timer)

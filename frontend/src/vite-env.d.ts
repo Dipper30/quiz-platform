@@ -7,3 +7,9 @@ export interface User {
   id: number,
   chatroomId: number|null,
 }
+
+declare interface HTTPResponse {
+  msg: string,
+  code: number,
+  data: any,
+}

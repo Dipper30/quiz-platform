@@ -15,29 +15,6 @@ class Auth extends BaseService {
     super()
   }
 
-  async findAccountByUserID (uid: Number): Promise<any> {
-    try {
-      const hasAccount = await UserModel.findByPk(uid)
-      // const hasAccount = await UserModel.findOne({
-      //   where: { username },
-      // })
-      return hasAccount
-    } catch (error) {
-      return false
-    }
-  }
-
-  async ifHasAccount (uid: Number): Promise<any> {
-    try {
-      const user = await UserModel.findByPk(uid)
-      if (!user) return false
-      else return user
-    } catch (error) {
-      return error
-    }
-    
-  }
-
   async loginAccount (params: Account) {
     let { username, password } = params
     try {
@@ -70,20 +47,6 @@ class Auth extends BaseService {
     }
   }
 
-  async getAllUserInfo (uids: number[]) {
-    try {
-      const users = await UserModel.findAll({
-        where: {
-          id: {
-            [Op.in]: uids,
-          },
-        },
-      })
-      return users
-    } catch (error) {
-      console.log(error)
-    }
-  }
 }
 
 export default new Auth()

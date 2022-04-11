@@ -13,8 +13,6 @@ const Home: React.FC<any> = (props: any) => {
       <h1>hello home</h1>
       <Button type="primary">按钮</Button>
     </>
-    
-    
   )
 }
 

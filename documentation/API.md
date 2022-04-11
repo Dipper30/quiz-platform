@@ -165,7 +165,7 @@
     code: 201,
     msg: 'ok',
     data: {
-      part_id: Number,
+      partId: Number,
       questions: [
         {
           id: Number,

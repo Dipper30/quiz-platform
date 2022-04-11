@@ -8,11 +8,13 @@ import {
 import {
   AuthValidator, QuizValidator,
 } from '../validator'
+import TokenValidator from '../validator/TokenValidator'
 
 const router: Router = Router()
 
 // login
 router.post('/login', AuthValidator.checkLogin, AuthController.login)
+router.post('/token', TokenValidator.verifyToken, AuthController.loginByToken)
 
 // update quiz
 router.post('/initQuiz', QuizValidator.checkInitQuiz, QuizController.initQuiz)

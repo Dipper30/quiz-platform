@@ -7,10 +7,3 @@ export const login = (params: {username: string, password: string}) => {
 export const loginByToken = () => {
   return post('/token')
 }
-
-/**
- * get messages using token
- */
-export const getMessage = () => {
-  return get('/getMessage')
-}
