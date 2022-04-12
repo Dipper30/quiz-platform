@@ -4,7 +4,7 @@ type AdminHomeProps = {
 
 const AdminHome: React.FC<AdminHomeProps> = (props) => {
   return (
-    <div className="">
+    <div className=''>
       AdminHome
     </div>
   )

@@ -1,7 +1,7 @@
 import { Part, SeqType, PartChoice as PartChoiceType, Recommendation as RecommendationType } from '../../../vite-env'
 import Sequence from './Sequence'
 import { Input, Button } from 'antd'
-import { InputHTMLAttributes, useState } from 'react'
+import { useState } from 'react'
 import PartChoice from './PartChoice'
 import { PlusCircleOutlined } from '@ant-design/icons'
 import Recommendation from './Recommendation'
@@ -17,9 +17,26 @@ const PartItem: React.FC<PartItemProps> = (props) => {
 
   const [choiceId, setChoiceId] = useState(Date.now())
   const [recommendationId, setRecommendationId] = useState(Date.now())
-  const setSequence = (seq: number) => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const setSequence = (seq: number) => {} //TODO should support editing sequence
 
-  }
+  const partchoiceList = props.part.choices.map((choice) => (
+    <PartChoice
+      key={choice.id}
+      choice={choice}
+      update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
+      deleteChoice={deleteChoice}
+    />
+  ))
+
+  const recommendationList = props.part.recommendations.map((recommendation) => (
+    <Recommendation
+      key={recommendation.id}
+      id={recommendation.id || recommendationId}
+      recommendation={recommendation}
+      update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
+      deleteRecommendation={deleteRecommendation} />
+  ))
 
   const updatePartInfo = (key: string, value: any) => {
     const newPart = props.part
@@ -74,46 +91,28 @@ const PartItem: React.FC<PartItemProps> = (props) => {
   }
 
   return (
-    <div className="admin-part-container">
+    <div className='admin-part-container'>
       <Sequence seq={props.part.seq} type={props.seqType} setSequence={setSequence} />
-      <div className="part-content">
-        <div className="input-item">
-          <div className="label">
+      <div className='part-content'>
+        <div className='input-item'>
+          <div className='label'>
             Part Name:
           </div>
-          <div className="input-wrapper">
+          <div className='input-wrapper'>
             <Input defaultValue={props.part.partName} onInput={(e: any) => updatePartInfo('choices', e.target.value)} />
           </div>
-          <Button className="delete-btn" danger onClick={() => props.deletePart(props.part.seq)}> Delete </Button>
+          <Button className='delete-btn' danger onClick={() => props.deletePart(props.part.seq)}> Delete </Button>
         </div>
-        <div className="section-divider">
+        <div className='section-divider'>
           Choices: {` ${props.part.choices.length}`}
-          <PlusCircleOutlined className="icon-btn add-btn" onClick={addNewChoice} />
+          <PlusCircleOutlined className='icon-btn add-btn' onClick={addNewChoice} />
         </div>
-        {
-          props.part.choices.map((choice) => (
-            <PartChoice
-              key={choice.id}
-              choice={choice}
-              update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
-              deleteChoice={deleteChoice}
-            />
-          ))
-        }
-        <div className="section-divider">
+        { partchoiceList }
+        <div className='section-divider'>
           Recommendations: {` ${props.part.recommendations.length}`}
-          <PlusCircleOutlined className="icon-btn add-btn" onClick={addNewRecommendation} />
+          <PlusCircleOutlined className='icon-btn add-btn' onClick={addNewRecommendation} />
         </div>
-        {
-          props.part.recommendations.map((recommendation) => (
-            <Recommendation
-              key={recommendation.id}
-              id={recommendation.id || recommendationId}
-              recommendation={recommendation}
-              update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
-              deleteRecommendation={deleteRecommendation} />
-          ))
-        }
+        { recommendationList }
       </div>
       
     </div>

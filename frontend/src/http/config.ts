@@ -1,3 +1,4 @@
+import { Quiz } from '../vite-env'
 import { http, get, post, uploadFiles } from './api'
 
 export const login = (params: {username: string, password: string}) => {
@@ -6,4 +7,12 @@ export const login = (params: {username: string, password: string}) => {
 
 export const loginByToken = () => {
   return post('/token')
+}
+
+export const initQuiz = (quiz: Quiz) => {
+  return post('initQuiz', quiz)
+}
+
+export const getQuizzesInfo = () => {
+  return get('quizzes')
 }

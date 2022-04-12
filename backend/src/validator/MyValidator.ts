@@ -67,6 +67,9 @@ class MyValidator {
     return this.#isValid
   }
 
+  /**
+   * Override show value
+   */ 
   toString () {
     return this.#isValid
   }

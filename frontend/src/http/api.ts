@@ -1,12 +1,12 @@
 import axios, { AxiosResponse } from 'axios'
 import { BASE_URL as url, PORT as port } from '../config/env'
-import { getToken } from '../utils'
+import { errorMessage, getToken } from '../utils'
+import { APIResponse } from '../vite-env'
 
 const env = import.meta.env
 const { MODE } = env
 const BASE_URL: string = url[MODE]
 const PORT: string = port[MODE]
-
 
 // const apiBaseURL = env.SERVER_URL + '/api/v1'
 // const apiBaseURL = process.env.REACT_APP_ENVIRONMENT == 'local' ? 'http://10.215.23.201:8080/api/v1' : 
@@ -28,14 +28,6 @@ export const http = axios.create({
 
 http.defaults.headers.post['Content-Type'] = 'application/json'
 
-try {
-  let token = getToken()
-  console.log
-  if (token) http.defaults.headers.common['token'] = token
-} catch (error) {
-  // do nothing
-}
-
 http.interceptors.request.use(
   (config: any) => {
     let token = getToken()
@@ -53,8 +45,7 @@ http.interceptors.response.use(
       return data
     case 10002:
       // token error
-      console.log('wrong token, please relogin')
-  
+      errorMessage('You are not authorized! Please log in as Admin.')
       return { code, msg }
     // case 10003:
     //   console.log('not authorized')
@@ -74,7 +65,7 @@ http.interceptors.response.use(
 /**
  * get request
  */
-export const get = (url: string, params?: any): Promise<AxiosResponse<any, any>> => {
+export const get = (url: string, params?: any): Promise<APIResponse> => {
   if (!params) return http.get(url)
   let count = 1
   for (let attr in params) {
@@ -88,7 +79,7 @@ export const get = (url: string, params?: any): Promise<AxiosResponse<any, any>>
 /**
  * post request
  */
-export const post = (url: string, params?: any): Promise<AxiosResponse<any, any>> => {
+export const post = (url: string, params?: any): Promise<APIResponse> => {
   if (!params) return http.post(url)
   return http.post(url, params)
 }

@@ -1,6 +1,5 @@
 import { InputNumber, Input, Button } from 'antd'
 import { useState } from 'react'
-import { deepClone } from '../../../utils'
 import { Domain, Part, SeqType } from '../../../vite-env'
 import PartItem from './PartItem'
 import Sequence from './Sequence'
@@ -17,6 +16,16 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
   const [seqType, setSeqType] = useState(('plain') as SeqType)
   const [partId, setPartId] = useState(Date.now())
   const [partsCollapsed, setPartsCollapsed] = useState(false)
+
+  const partList = props.domain?.parts?.map((part: Part, index: number) => (
+    <PartItem
+      key={part.id}
+      part={part}
+      seqType={seqType}
+      update={(part, seq) => updateDomainInfo({ part, seq }, 'part')}
+      deletePart={deletePart}
+    />
+  )) || []
   
   const updateDomainInfo = (value: any, key: string) => {
     const newDomain = props.domain
@@ -34,9 +43,8 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
     props.update(newDomain, props.domain.seq)
   }
 
-  const setSequence = (seq: number) => {
-
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  const setSequence = (seq: number) => { }
 
   const addNewPart = () => {
     const { parts } = props.domain
@@ -68,39 +76,28 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
   return (
     <div className={`admin-domain-container ${partsCollapsed ? 'collapsed' : 'expanded'}`}>
       <Sequence type={seqType} seq={props.domain.seq} setSequence={setSequence} />
-      <div className="domain-content">
-        <div className="input-item">
-          <div className="label">
+      <div className='domain-content'>
+        <div className='input-item'>
+          <div className='label'>
             Domain Name:
           </div>
-          <div className="input-wrapper">
-            <Input placeholder="My Quiz" defaultValue={props.domain.domainName} onInput={(e: any) => updateDomainInfo(e.target.value, 'domainName')} />
+          <div className='input-wrapper'>
+            <Input placeholder='My Quiz' defaultValue={props.domain.domainName} onInput={(e: any) => updateDomainInfo(e.target.value, 'domainName')} />
           </div>
-          <Button danger className="delete-btn" onClick={() => props.deleteDomain(props.domain.seq)}>Delete</Button>
+          <Button danger className='delete-btn' onClick={() => props.deleteDomain(props.domain.seq)}>Delete</Button>
         </div>
-        <div className="input-item">
-          <div className="label">
+        <div className='input-item'>
+          <div className='label'>
             Domain Proportion:
           </div>
-          <div className="input-wrapper">
+          <div className='input-wrapper'>
             <InputNumber defaultValue={props.domain.proportion} min={0} max={100} onChange={(e: any) => updateDomainInfo(Number(e), 'proportion')} />
           </div>
         </div>
-        <div className="section-divider clickable" onClick={switchPartsHeight}>
+        <div className='section-divider clickable' onClick={switchPartsHeight}>
           Parts: { props.domain.parts.length } <UnorderedListOutlined />
         </div>
-        {
-          props.domain.parts && 
-          props.domain.parts.map((part: Part, index: number) => (
-            <PartItem
-              key={part.id}
-              part={part}
-              seqType={seqType}
-              update={(part, seq) => updateDomainInfo({ part, seq }, 'part')}
-              deletePart={deletePart}
-            />
-          ))
-        }
+        { partList }
         <Button onClick={addNewPart}> Add Part </Button>
       </div>
     </div>

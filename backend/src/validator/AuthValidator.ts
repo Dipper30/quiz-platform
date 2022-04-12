@@ -1,6 +1,5 @@
 import BaseValidator from './BaseValidator'
-import { isBetween, createError, Validate } from '../utils/validate'
-import v from 'validator'
+import { createError, Validate } from '../utils/validate'
 
 class AuthValidator extends BaseValidator {
 
@@ -15,7 +14,6 @@ class AuthValidator extends BaseValidator {
       next(error)
     }
   }
-
 
 }
 

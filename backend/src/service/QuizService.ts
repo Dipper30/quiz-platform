@@ -37,7 +37,7 @@ class Quiz extends BaseService {
         description: data.description ?? '',
         total_points: data.total_points,
         destroyed: false,
-      })
+      }, { transaction: t })
 
       const qid = newQuiz.id
 
@@ -49,13 +49,12 @@ class Quiz extends BaseService {
           seq: domain.seq,
           quiz_id: qid,
         })
-      ))
-
-      newDomains.map((d: any) => console.log(d.name))
+      ), { transaction: t })
 
       // create parts
-      newDomains.map(async (domain: any, index: number) => {
-        const { parts } = domains[index]
+      for (let index = 0; index < domains.length; index++) {
+        const domain = domains[index]
+        const { parts } = domain
         const newParts = await PartModel.bulkCreate(
           parts.map(part => ({
             name: part.partName,
@@ -66,31 +65,51 @@ class Quiz extends BaseService {
         )
 
         // create choices
-        newParts.map(async (part: any, index: number) => {
-          const currentPart = parts[index]
+        for (let i = 0; i < parts.length; i++) {
+          const currentPart = parts[i]
           const { choices, recommendations } = currentPart
           await PartChoiceModel.bulkCreate(
             choices.map(choice => ({
               description: choice.description,
               show_sub: choice.willShowSubQuestions,
               seq: choice.seq,
-              part_id: part.id,
-            }))
+              part_id: currentPart.id,
+            })), { transaction: t }
           )
           await RecommendationModel.bulkCreate(
             recommendations.map(recommendation => ({
               show_under: recommendation.showUnder,
               link: recommendation.link,
-              part_id: part.id,
-            }))
+              part_id: currentPart.id,
+            })), { transaction: t }
           )
-        })
-      })
+        }
+      }
 
       await t.commit()
-      return newQuiz
+      return omitFields(newQuiz.dataValues, ['destroyed'], true)
     } catch (error) {
       await t.rollback()
+      return error
+    }
+  }
+
+  async getQuizzes (sort: string = 'create') {
+    if (!sort) sort = 'create'
+    try {
+      const order = sort == 'create' ? [['createdAt', 'DESC']] : [['updatedAt', 'DESC']]
+      const quizzes = await QuizModel.findAll({
+        where: { destroyed: false },
+        attributes: {
+          exclude: this.excludeAttributes,
+          include: [this.formatDate('createdAt')],
+        },
+        order,
+      })
+      if (!quizzes) return []
+      return quizzes
+      // return omitFields(quizzes, ['destroyed'], false)
+    } catch (error) {
       return error
     }
   }
@@ -255,34 +274,43 @@ class Quiz extends BaseService {
   async getQuizById (data: { id: Number }, showDestroyed: Boolean = false) {
     try {
       const { id } = data
-      const quizModel = await QuizModel.findByPk(id)
+      const quizModel = await QuizModel.findByPk(id, { 
+        attributes: {
+          include: [this.formatDate('createdAt')],
+          exclude: this.excludeAttributes,
+        },
+      })
       if (!quizModel || (!showDestroyed && quizModel.destroyed == true)) throw new QuizModel(errCode.QUIZ_ERROR, 'Quiz Not Found.')
 
-      const quiz: GetQuiz = omitFields(quizModel.dataValues, ['destroyed'], true)
+      const quiz: GetQuiz = quizModel.dataValues
 
       const domainModels = await DomainModel.findAll({
         where: { quiz_id: quiz.id },
+        attributes: { exclude: this.excludeAttributes },
       })
 
       // append domains to quiz
-      quiz.domains = domainModels?.map((domain: any) => omitFields(domain.dataValues, ['destroyed'], true)) || []
+      quiz.domains = domainModels.map((v: any) => v.dataValues)
       
       // append parts to each domain
       for (const domain of quiz.domains) {
         const partModels = await PartModel.findAll({
           where: { domain_id: domain.id },
+          attributes: { exclude: this.excludeAttributes },
         })
-        domain.parts = partModels.map((part: any) => omitFields(part.dataValues, ['destroyed'], true)) || []
+        domain.parts = partModels.map((v: any) => v.dataValues)
         for (const part of domain.parts) {
           // append choices and recommendations to each part
           const partChoiceModels = await PartChoiceModel.findAll({
-            where: { part_id: part.id }
+            where: { part_id: part.id },
+            attributes: { exclude: this.excludeAttributes },
           })
           const recommendationModels = await RecommendationModel.findAll({
-            where: { part_id: part.id }
+            where: { part_id: part.id },
+            attributes: { exclude: this.excludeAttributes },
           })
-          part.choices = partChoiceModels?.map((partChocie: any) => omitFields(partChocie.dataValues, ['destroyed'], true)) || []
-          part.recommendations = recommendationModels?.map((recommendation: any) => omitFields(recommendation.dataValues, ['destroyed'], true)) || []
+          part.choices = partChoiceModels.map((v: any) => v.dataValues)
+          part.recommendations = recommendationModels.map((v: any) => v.dataValues)
         }
       }
       

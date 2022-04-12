@@ -34,15 +34,14 @@ export const enumIncludes = (enumType: any, el: any): Boolean => Object.values(e
  * @returns data after filtering
  */
 export const omitFields = (rawData: any, attrsToOmit: string[] = attrs, includingTS: Boolean = false): typeof rawData => {
-  
   if (!rawData || (!isArray(rawData) && !isObject(rawData))) return rawData
   if (includingTS) attrsToOmit = [ ...attrsToOmit, 'createdAt', 'updatedAt' ]
   
   // check data type
   if (isArray(rawData)) {
     return rawData.map((data: any) => {
-      Object.keys(data).forEach(attr => {
-        if (attrsToOmit.includes(attr)) delete data[attr]
+      Object.keys(data.dataValues).forEach(attr => {
+        if (attrsToOmit.includes(attr)) delete data.dataValues[attr]
       })
       return data
     })

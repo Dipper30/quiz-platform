@@ -8,14 +8,13 @@ const ContentHeader: React.FC<ContentHeaderProps> = (props) => {
       {
         props.breadcrumb ?
           (
-            <div className="admin-content-header-container">
-              { `Admin / ` } <span style={{color: '#1890ff'}}>{ `${props.breadcrumb}` }</span>
+            <div className='admin-content-header-container'>
+              { 'Admin / ' } <span style={{ color: '#1890ff' }}>{ `${props.breadcrumb}` }</span>
             </div>
           )
         : <div></div>
       }
     </>
-    
     
   )
 }

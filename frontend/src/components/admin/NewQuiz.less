@@ -19,9 +19,6 @@
           color: green;
         }
       }
-      .input-wrapper {
- 
-      }
       &.text-area {
         align-items: flex-start;
         .input-wrapper {
@@ -45,9 +42,6 @@
       .ok {
         color: green;
       }
-    }
-    .input-wrapper {
-
     }
     &.text-area {
       align-items: flex-start;
@@ -148,8 +142,7 @@
   padding: 10px 40px 0px 10px;
   border-radius: 10px;
   &:hover {
-    background-color: #cedaf545;
-    
+    background-color: @light-hover;
   }
 }
 
@@ -160,4 +153,9 @@
   justify-content: flex-start;
   align-items: flex-start;
   margin-bottom: 10px;
+}
+
+.submit-container {
+  margin-top: 20px;
+  flex-direction: row;
 }

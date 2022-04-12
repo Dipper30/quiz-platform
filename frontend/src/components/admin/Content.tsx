@@ -1,4 +1,4 @@
-import ContentHeader from "./ContentHeader"
+import ContentHeader from './ContentHeader'
 
 type ContentProps = {
   breadcrumb: string | null
@@ -6,7 +6,7 @@ type ContentProps = {
 
 const Content: React.FC<ContentProps> = (props) => {
   return (
-    <div className="admin-content-container">
+    <div className='admin-content-container'>
       <ContentHeader breadcrumb={props.breadcrumb} />
       { props.children }
     </div>

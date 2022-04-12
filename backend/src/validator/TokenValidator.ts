@@ -31,7 +31,7 @@ class TokenValidator extends BaseValidator {
   checkGetQuiz (req: any, res: any, next: any) {
     try {
       const { id } = req.params
-      const v = Validate(id).Numeric().Between(1, 2, false).check()
+      const v = Validate(id).Numeric().Between(1, 2, false)
       if (!v) throw createError('Wrong ID')
       next()
     } catch (error) {

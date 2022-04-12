@@ -53,3 +53,8 @@ interface Recommendation {
   link: string,
 }
 
+interface APIResponse {
+  code: number,
+  msg: string,
+  data: any,
+}

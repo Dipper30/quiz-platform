@@ -27,6 +27,23 @@ class Quiz extends BaseController {
     }
   }
 
+  async getQuizzes (req: any, res: any, next: any): Promise<any> {
+    try {
+      const { sort } = req.query
+      const quizzes = await QuizService.getQuizzes(sort)
+      
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          quizzes
+        },
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
   async createOrUpdateQuestion (req: any, res: any, next: any): Promise<any> {
     try {
       const data: Question = req.body
