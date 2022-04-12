@@ -32,7 +32,7 @@ const PartChoice: React.FC<PartChoiceProps> = (props) => {
 
   return (
     <div className="admin-partchoice-container">
-      <Sequence type={seqType} seq={props.choice.seq} setSequence={setSequence} />
+      {/* <Sequence type={seqType} seq={props.choice.seq} setSequence={setSequence} /> */}
       <Input placeholder="choice descriptions here" defaultValue={props.choice.description} onInput={(e: any) => updateChoiceInfo('domainName', e.target.value)} />
       <Checkbox onChange={(e: any) => updateChoiceInfo('willShowSubQuestions', e.target.checked)}> Show Sub Questions </Checkbox>
       { props.choice.willShowSubQuestions }

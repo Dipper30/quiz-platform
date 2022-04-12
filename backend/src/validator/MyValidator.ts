@@ -66,6 +66,10 @@ class MyValidator {
     }
     return this.#isValid
   }
+
+  toString () {
+    return this.#isValid
+  }
 }
 
 export default MyValidator

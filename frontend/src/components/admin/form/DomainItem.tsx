@@ -86,8 +86,8 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
             <InputNumber defaultValue={props.domain.proportion} min={0} max={100} onChange={(e: any) => updateDomainInfo(Number(e), 'proportion')} />
           </div>
         </div>
-        <div className="section-divider">
-          Parts: { props.domain.parts.length } <UnorderedListOutlined onClick={switchPartsHeight} />
+        <div className="section-divider clickable" onClick={switchPartsHeight}>
+          Parts: { props.domain.parts.length } <UnorderedListOutlined />
         </div>
         {
           props.domain.parts && 
