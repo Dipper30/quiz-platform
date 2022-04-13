@@ -16,6 +16,7 @@ export interface Part {
   seq: number,
   choices: Choice[],
   recommendations: Recommendation[],
+  totalPoints?: number,
 }
 
 export interface Domain {
@@ -49,7 +50,7 @@ export interface Choice {
   seq: Number,
   description: String,
   questionId: Number,
-  score: Number,
+  score: number,
 }
 
 export interface GetQuiz {

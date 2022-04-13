@@ -143,8 +143,8 @@ class Quiz extends BaseController {
 
       const { token } = req.headers
       const isValidToken = TokenService.verifyToken(token)
-
-      const data: { pid: Number } = req.query
+      
+      const data = { pid: Number(req.query.pid) }
       const questions = await QuizService.getQuestions(data, isValidToken)
 
       res.json({

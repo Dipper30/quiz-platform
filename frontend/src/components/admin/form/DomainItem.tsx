@@ -16,16 +16,6 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
   const [seqType, setSeqType] = useState(('plain') as SeqType)
   const [partId, setPartId] = useState(Date.now())
   const [partsCollapsed, setPartsCollapsed] = useState(false)
-
-  const partList = props.domain?.parts?.map((part: Part, index: number) => (
-    <PartItem
-      key={part.id}
-      part={part}
-      seqType={seqType}
-      update={(part, seq) => updateDomainInfo({ part, seq }, 'part')}
-      deletePart={deletePart}
-    />
-  )) || []
   
   const updateDomainInfo = (value: any, key: string) => {
     const newDomain = props.domain
@@ -72,6 +62,16 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
   const switchPartsHeight = () => {
     setPartsCollapsed(!partsCollapsed)
   }
+
+  const partList = props.domain?.parts?.map((part: Part, index: number) => (
+    <PartItem
+      key={part.id}
+      part={part}
+      seqType={seqType}
+      update={(part, seq) => updateDomainInfo({ part, seq }, 'part')}
+      deletePart={deletePart}
+    />
+  )) || []
 
   return (
     <div className={`admin-domain-container ${partsCollapsed ? 'collapsed' : 'expanded'}`}>

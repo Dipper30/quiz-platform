@@ -5,27 +5,34 @@ import { useNavigate } from 'react-router-dom'
 
 type QuizAbstractProps = {
   quiz: QuizType,
+  clickable: boolean,
+  withDomain: boolean,
 }
 
 const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
 
   const navagate = useNavigate()
-  const createdAt = useMemo(() => props.quiz.createdAt, [props.quiz.createdAt])
 
   const onQuizDetail = () => {
-    navagate(`/admin/quiz/${props.quiz.id}`)
+    props.clickable && navagate(`/admin/quiz/${props.quiz.id}`)
   }
 
   return (
-    <div className='admin-quiz-abstract-container' onClick={onQuizDetail}>
+    <div
+      className={`admin-quiz-abstract-container
+        ${props.clickable ?' clickable' : ''}
+        ${props.withDomain ?' hover' : ''}
+      `}
+      onClick={onQuizDetail}
+    >
       <div className='header'>
         <div> {props.quiz.title} </div>
-        <Tag color='geekblue'> { props.quiz.tag } </Tag>
+        { props.quiz.tag && <Tag color='geekblue'> { props.quiz.tag } </Tag> }
       </div>
        
       <div className='row'>
         <div className='col'>
-          { `Total Points: ${props.quiz.totalPoints}` } 
+          { `Total Points: ${props.quiz.total_points}` } 
         </div>
         <div className='col'>
           { `Created At: ${props.quiz.createdAt}` } 
@@ -34,6 +41,15 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
       <div className='row'>
         { `Descriptions: ${props.quiz.description}` } 
       </div>
+
+      {
+        props.withDomain &&
+        props.quiz.domains.map(domain => (
+          <div className='domain-container' key={domain.id}>
+            <span className='domain-name'>{ domain.name }</span> &nbsp; <span>{ domain.proportion } %</span> 
+          </div>
+        ))
+      }
     </div>
 
   )

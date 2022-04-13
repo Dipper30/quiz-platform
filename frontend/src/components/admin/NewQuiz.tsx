@@ -22,22 +22,13 @@ const initQuiz: Quiz = {
 
 const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
 
-  const [quiz, setQuiz] = useState(initQuiz)
+  const [quiz, setQuiz] = useState(deepClone(initQuiz))
   const [domainId, setDomainId] = useState(Date.now())
 
   const calculateTotalProportion = (domains: Domain[]) => {
     return domains.reduce((pre, cur) => pre + cur.proportion, 0)
   }
   const currentTotalProportion = useMemo(() => calculateTotalProportion(quiz.domains), [quiz.domains])
-
-  const domainList = quiz.domains?.map((domain: Domain, index: number) => (
-    <DomainItem
-      key={domain.id}
-      domain={domain}
-      update={(domain: Domain, seq: number) => updateQuizInfo('domains', { domain, seq })}
-      deleteDomain={deleteDomain}
-    />
-  ))
 
   const updateQuizInfo = (key: string, value: any) => {
     switch (key) {
@@ -53,7 +44,7 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
       case 'description':
         quiz.description = value
         break
-      case 'domain':
+      case 'domains':
         // eslint-disable-next-line no-case-declarations
         const { domain, seq } = value
         quiz.domains[seq - 1] = domain
@@ -86,12 +77,10 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
 
   const onSubmit = async () => {
     if (!validateForm()) return
-    console.log('Submit Quiz: ', quiz)
     const res: APIResponse = await api.initQuiz(quiz)
     if (!handleResult(res, false)) return
     successMessage('quiz ' + res.data.quiz.id + ' created')
-    console.log('Created: ', res.data.quiz)
-    setQuiz(initQuiz)
+    setQuiz(deepClone(initQuiz))
   }
 
   const validateForm = () => {
@@ -107,8 +96,17 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
   }
 
   const onReset = () => {
-    setQuiz(initQuiz)
+    setQuiz(deepClone(initQuiz))
   }
+
+  const domainList = quiz.domains?.map((domain: Domain, index: number) => (
+    <DomainItem
+      key={domain.id}
+      domain={domain}
+      update={(domain: Domain, seq: number) => updateQuizInfo('domains', { domain, seq })}
+      deleteDomain={deleteDomain}
+    />
+  ))
 
   return (
     <div className='admin-newquiz-container'>

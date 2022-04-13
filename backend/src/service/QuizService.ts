@@ -42,47 +42,49 @@ class Quiz extends BaseService {
       const qid = newQuiz.id
 
       // create domains
-      const newDomains = await DomainModel.bulkCreate(
-        domains.map(domain => ({
+
+      for (let dIndex = 0; dIndex < domains.length; dIndex++) {
+        const domain = domains[dIndex]
+        const domainModel = await DomainModel.create({
           name: domain.domainName,
           proportion: domain.proportion,
           seq: domain.seq,
           quiz_id: qid,
-        })
-      ), { transaction: t })
+        }, { transaction: t })
 
-      // create parts
-      for (let index = 0; index < domains.length; index++) {
-        const domain = domains[index]
+        const domainId = domainModel.id
         const { parts } = domain
-        const newParts = await PartModel.bulkCreate(
-          parts.map(part => ({
+
+        // append parts
+        for (let pIndex = 0; pIndex < parts.length; pIndex++) {
+          const part = parts[pIndex]
+          const partModel = await PartModel.create({
             name: part.partName,
             seq: part.seq,
             destroyed: false,
-            domain_id: domain.id,
-          }))
-        )
+            domain_id: domainId,
+          }, { transaction: t })
 
-        // create choices
-        for (let i = 0; i < parts.length; i++) {
-          const currentPart = parts[i]
-          const { choices, recommendations } = currentPart
+          const partId = partModel.id
+
+          // append choices and recommendaitons
+          const { choices, recommendations } = part
           await PartChoiceModel.bulkCreate(
             choices.map(choice => ({
               description: choice.description,
               show_sub: choice.willShowSubQuestions,
               seq: choice.seq,
-              part_id: currentPart.id,
+              part_id: partId
             })), { transaction: t }
           )
           await RecommendationModel.bulkCreate(
             recommendations.map(recommendation => ({
               show_under: recommendation.showUnder,
               link: recommendation.link,
-              part_id: currentPart.id,
+              part_id: partId,
             })), { transaction: t }
           )
+
         }
       }
 
@@ -293,13 +295,30 @@ class Quiz extends BaseService {
       quiz.domains = domainModels.map((v: any) => v.dataValues)
       
       // append parts to each domain
-      for (const domain of quiz.domains) {
+      for (let index = 0; index < quiz.domains.length; index++) {
+        const domain = quiz.domains[index]
         const partModels = await PartModel.findAll({
           where: { domain_id: domain.id },
           attributes: { exclude: this.excludeAttributes },
         })
         domain.parts = partModels.map((v: any) => v.dataValues)
-        for (const part of domain.parts) {
+
+        for (let pIndex = 0; pIndex < domain.parts.length; pIndex++) {
+          const part = domain.parts[pIndex]
+
+          // calculate total points
+          const questionModels = await QuestionModel.findAll({
+            where: { part_id: part.id },
+            attributes: { include: ['id'] },
+          })
+          let sum = 0
+          for (let qIndex = 0; qIndex < questionModels.length; qIndex++) {
+            const qid = questionModels[qIndex].id
+            const total = await ChoiceModel.getTotalPointsByQuestionId(qid)
+            sum += total
+          }
+          part.totalPoints = sum
+
           // append choices and recommendations to each part
           const partChoiceModels = await PartChoiceModel.findAll({
             where: { part_id: part.id },
@@ -323,19 +342,22 @@ class Quiz extends BaseService {
   async getQuestions (data: { pid: Number }, withAuth: Boolean = false, showDestroyed: Boolean = false) {
     try {
       const { pid } = data
+      
       const questionModels = await QuestionModel.findAll({
-        where: { part_id: pid, destroyed: false }
+        where: { part_id: pid, destroyed: false },
+        attributes: { exclude: this.excludeAttributes },
       })
 
-      const questions: Question[] = questionModels?.map((question: any) => omitFields(question.dataValues, ['destroyed'], true)) || []
-      console.log(questions)
+      const questions: Question[] = questionModels?.map((question: any) => question.dataValues)
+      
       // append choices to each question
-      for (const question of questions) {
+      for (let index = 0; index < questions.length; index++) {
+        const question = questions[index]
         const choiceModels = await ChoiceModel.findAll({
           where: { question_id: question.id, destroyed: false },
+          attributes: { exclude: this.excludeAttributes },
         })
-        const fieldsToOmit = withAuth ? ['destroyed'] : ['destroyed', 'score']
-        question.choices = choiceModels?.map((choice: any) => omitFields(choice.dataValues, fieldsToOmit, true)) || []
+        question.choices = choiceModels?.map((choice: any) => choice.dataValues)
       }
 
       return questions

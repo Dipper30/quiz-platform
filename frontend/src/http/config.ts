@@ -16,3 +16,11 @@ export const initQuiz = (quiz: Quiz) => {
 export const getQuizzesInfo = () => {
   return get('quizzes')
 }
+
+export const getQuizById = (id: number) => {
+  return get(`quiz/${id}`)
+}
+
+export const getQuestionsByPartId = (id: number) => {
+  return get('questions', { pid: id })
+}

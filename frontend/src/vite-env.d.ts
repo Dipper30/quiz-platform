@@ -4,6 +4,8 @@ declare type REACT_APP_ENVIRONMENT = 'development' | 'production'
 
 declare type SeqType = 'plain' | 'editing'
 
+declare type Editing = 'plain' | 'editing'
+
 export interface User {
   username: string,
   id: number,
@@ -31,6 +33,8 @@ interface Domain {
   proportion: number,
   seq: number,
   parts: Part[],
+  name?: string,
+  [key: string]: any,
 }
 
 interface Part {
@@ -39,6 +43,9 @@ interface Part {
   seq: number,
   choices: PartChoice[],
   recommendations: Recommendation[],
+  totalPoints?: number,
+  domainName?: string,
+  name?: string,
 }
 
 interface PartChoice {
@@ -50,6 +57,7 @@ interface PartChoice {
 interface Recommendation {
   id?: number,
   showUnder: number,
+  show_under?: number,
   link: string,
 }
 

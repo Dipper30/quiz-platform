@@ -20,24 +20,6 @@ const PartItem: React.FC<PartItemProps> = (props) => {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const setSequence = (seq: number) => {} //TODO should support editing sequence
 
-  const partchoiceList = props.part.choices.map((choice) => (
-    <PartChoice
-      key={choice.id}
-      choice={choice}
-      update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
-      deleteChoice={deleteChoice}
-    />
-  ))
-
-  const recommendationList = props.part.recommendations.map((recommendation) => (
-    <Recommendation
-      key={recommendation.id}
-      id={recommendation.id || recommendationId}
-      recommendation={recommendation}
-      update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
-      deleteRecommendation={deleteRecommendation} />
-  ))
-
   const updatePartInfo = (key: string, value: any) => {
     const newPart = props.part
     switch (key) {
@@ -48,6 +30,9 @@ const PartItem: React.FC<PartItemProps> = (props) => {
         const { choice, seq } = value
         newPart.choices = newPart.choices.map((c: any) => c.seq == seq ? choice : c)
         break
+      case 'recommendations':
+        const { recommendation, id } = value
+        newPart.recommendations = newPart.recommendations.map((r: any) => r.id == id ? recommendation : r)
     }
     props.update(newPart, props.part.seq)
   }
@@ -86,9 +71,26 @@ const PartItem: React.FC<PartItemProps> = (props) => {
 
   const deleteRecommendation = (id: number) => {
     props.part.recommendations = props.part.recommendations.filter(r => r.id != id)
-    console.log(props.part.recommendations)
     props.update(props.part, props.part.seq)
   }
+
+  const partchoiceList = props.part.choices.map((choice) => (
+    <PartChoice
+      key={choice.id}
+      choice={choice}
+      update={(choice, seq) => updatePartInfo('choices', { choice, seq })}
+      deleteChoice={deleteChoice}
+    />
+  ))
+
+  const recommendationList = props.part.recommendations.map((recommendation) => (
+    <Recommendation
+      key={recommendation.id}
+      id={recommendation.id || recommendationId}
+      recommendation={recommendation}
+      update={(recommendation, id) => updatePartInfo('recommendations', { recommendation, id })}
+      deleteRecommendation={deleteRecommendation} />
+  ))
 
   return (
     <div className='admin-part-container'>

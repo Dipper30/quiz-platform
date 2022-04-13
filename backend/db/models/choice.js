@@ -12,6 +12,13 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
+
+    static async getTotalPointsByQuestionId(id) {
+      return await Choice.findAll({
+        where: { question_id: id },
+        attributes: [[sequelize.fn('sum', sequelize.col('score')), 'totalPoints']],
+      })
+    }
   }
   Choice.init({
     description: DataTypes.STRING,

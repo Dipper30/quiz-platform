@@ -30,7 +30,7 @@ const Side: React.FC<SideProp> = (props) => {
       setSelectedIndex(currentConfig?.index || 1)
       props.updateBreadCrumb(currentConfig ? currentConfig.title : (currentPage == 'admin' ? ' Home' : null))
     }
-  }, [])
+  }, [location])
 
   return (
     <div className='admin-side-container'>
