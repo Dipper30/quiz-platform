@@ -29,6 +29,17 @@ class QuizValidator extends BaseValidator {
     }
   }
 
+  checkDeleteQuiz (req: any, res: any, next: any) {
+    try {
+      const { qid } = req.body
+      const v = Validate(qid).Number()
+      if (!v) throw createError()
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
 }
 
 export default new QuizValidator()

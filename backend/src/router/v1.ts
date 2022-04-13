@@ -18,10 +18,11 @@ router.post('/token', TokenValidator.verifyToken, AuthController.loginByToken)
 
 // update quiz
 router.post('/initQuiz', QuizValidator.checkInitQuiz, TokenValidator.verifyToken, QuizController.initQuiz)
-router.post('/question', QuizController.createOrUpdateQuestion)
-router.post('/deleteQuestion', QuizController.deleteQuestion)
-router.post('/choice', QuizController.createOrUpdateChoice)
-router.post('/deleteChoice', QuizController.deleteChoice)
+router.post('/deleteQuiz', QuizValidator.checkDeleteQuiz, TokenValidator.verifyToken, QuizController.deleteQuiz)
+router.post('/question', TokenValidator.verifyToken, QuizController.createOrUpdateQuestion)
+router.post('/deleteQuestion', TokenValidator.verifyToken, QuizController.deleteQuestion)
+router.post('/choice', TokenValidator.verifyToken, QuizController.createOrUpdateChoice)
+router.post('/deleteChoice', TokenValidator.verifyToken, QuizController.deleteChoice)
 
 // requests from users: hiding attributes such as 'score'
 router.get('/questions', QuizController.getQuestions)

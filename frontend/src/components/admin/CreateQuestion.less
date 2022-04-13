@@ -1,0 +1,40 @@
+@import '../../index.less';
+
+.admin-create-question-container {
+  padding: 5px;
+  border-radius: 10px;
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .seq {
+    width: 40px;
+  }
+  .choice-container {
+
+  }
+  &:hover {
+    background-color: @light-hover;
+  }
+}
+
+
+
+.admin-create-choice-container {
+  margin: 5px;
+  .ant-input {
+    min-width: 400px;
+  }
+  .answer {
+    padding: 2px 5px;
+    color: @green;
+    background-color: aliceblue;
+  }
+  .delete-btn {
+    color: @red;
+    font-size: 20px;
+    cursor: pointer;
+  }
+}

@@ -1,6 +1,6 @@
 import './Quiz.less'
 import { useEffect, useState } from 'react'
-import { getQuizzesInfo } from '../../http/config'
+import api from '../../http'
 import { errorMessage, handleResult } from '../../utils'
 import { Quiz as QuizType } from '../../vite-env'
 import QuizAbstract from './QuizAbstract'
@@ -13,16 +13,17 @@ const Quiz: React.FC<QuizProps> = (props) => {
 
   const [quizzes, setQuizzes] = useState<QuizType[]>([])
 
+  const getQuizzesInfo = async () => {
+    const res = await api.getQuizzesInfo()
+    if (!handleResult(res, false)) return
+    setQuizzes(res.data.quizzes)
+  }
+
   useEffect(() => {
-    getQuizzesInfo().then(
-      (res) => {
-        if (!handleResult(res, false)) return
-        setQuizzes(res.data.quizzes)
-      },
-    ).catch(err => errorMessage(err))
+    getQuizzesInfo()
   }, [])
 
-  const quizList = quizzes.map(quiz => <QuizAbstract clickable={true} key={quiz.id} quiz={quiz} withDomain={false} />)
+  const quizList = quizzes.map(quiz => <QuizAbstract clickable={true} key={quiz.id} quiz={quiz} withDomain={false} deleted={getQuizzesInfo} />)
 
   return (
     <div className='admin-quiz-container'>

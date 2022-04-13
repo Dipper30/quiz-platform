@@ -101,7 +101,7 @@ const PartItem: React.FC<PartItemProps> = (props) => {
             Part Name:
           </div>
           <div className='input-wrapper'>
-            <Input defaultValue={props.part.partName} onInput={(e: any) => updatePartInfo('choices', e.target.value)} />
+            <Input defaultValue={props.part.partName} onInput={(e: any) => updatePartInfo('partName', e.target.value)} />
           </div>
           <Button className='delete-btn' danger onClick={() => props.deletePart(props.part.seq)}> Delete </Button>
         </div>

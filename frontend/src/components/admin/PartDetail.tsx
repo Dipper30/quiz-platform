@@ -1,7 +1,11 @@
 import { createRef, useEffect, useRef, useState } from 'react'
 import { useStore } from 'react-redux'
-import { Editing, Part } from '../../vite-env'
+import { Editing, Part, Question } from '../../vite-env'
 import { RightOutlined, DownOutlined } from '@ant-design/icons'
+import api from '../..//http'
+import { deepClone, handleResult } from '../../utils'
+import { CreateQuestion } from './CreateQuestion'
+import { choiceSeq } from '../../config/choices'
 
 type PartHeaderProps = {
   
@@ -22,25 +26,55 @@ type PartDetailProps = {
 
 const PartDetail: React.FC<PartDetailProps> = (props) => {
 
+  let timer: any = null
   const [collapsed, setCollapsed] = useState(true)
-  const [questions, setQuestions] = useState([1, 2, 3 ])
+  const [questions, setQuestions] = useState<Question[]>([])
   const partRef = useRef<any>()
-  const questionRef = useRef<any>()
+  const questionsRef = useRef<any>()
+  const newQuestionRef = useRef<any>()
 
   useEffect(() => {
-    (partRef.current as any).style.height = collapsed ? '60px' : `${ questionRef.current.clientHeight + 70 }px`
-
+    resize()
   }, [collapsed])
 
-  useEffect
+  useEffect(() => {
+    getQuestionsByPartId()
+  }, [])
 
-  const getQuestionsByPartId = () => {
-    
+  // useEffect
+
+  const getQuestionsByPartId = async () => {
+    const res = await api.getQuestionsByPartId((props.part.id) as number)
+    if (!handleResult(res, false)) return
+    const { data } = res
+    const { partId, questions } = data
+    setQuestions(questions)
   }
 
-  const questionList = questions.map((question: any) => (
-    <div className='question-container' key={question}>
-      {question}
+  const resize = () => {
+    if (timer) return 
+    console.log('@@@@resize', questionsRef.current.clientHeight)
+    setTimeout(() => {
+      partRef.current.style.height = collapsed ? '60px' :
+      `${ questionsRef.current.clientHeight + 70 }px`
+      clearTimeout(timer)
+    }, 0)
+  }
+
+  const updateQuestion = (question: Question) => {
+    questions.push(question)
+    setQuestions(deepClone(questions))
+    resize()
+  }
+
+  const questionList = questions.map((question: Question) => (
+    <div className='question-container' key={question.id}>
+      { question.description }
+      { question.choices.map(c => {
+        return (
+          <div key={c.id}> {choiceSeq[c.seq] }. { c.description } </div>
+        )
+      }) }
     </div>
   ))
 
@@ -48,18 +82,22 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
     <div ref={partRef} className='admin-part-detail-container'>
 
       <div className='header' onClick={() => setCollapsed(!collapsed)}>
-        { props.part.domainName } / { props.part.name } ( { props.part.totalPoints } )
+        { props.part.domainName } / { props.part.name } ( { questions.length } ) Total Points: { props.part.totalPoints }
         <div className='icon' >
           { collapsed ? <RightOutlined /> : <DownOutlined /> }
         </div>
       </div>
-      <div className='question-list-container' ref={questionRef} >
-        { questions.map((question: any) => (
-          <div className='question-container' key={question}>
-            {question}
-          </div>))
-        }
+      <div className='question-list-container' ref={questionsRef} >
+        { questionList }
+        <CreateQuestion
+          resize={resize}
+          update={updateQuestion}
+          partId={Number(props.part.id)}
+          createQuestion={function (): void {
+          throw new Error('Function not implemented.')
+        } } />
       </div>
+      
     </div>
   )
 }

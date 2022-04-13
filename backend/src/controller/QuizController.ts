@@ -44,6 +44,22 @@ class Quiz extends BaseController {
     }
   }
 
+  async deleteQuiz (req: any, res: any, next: any): Promise<any> {
+    try {
+      const data: { qid: number } = req.body
+      const deleted = await QuizService.deleteQuiz(data.qid)
+      if (isError(deleted)) throw deleted
+      
+      res.json({
+        code: 201,
+        msg: 'ok',
+        data: null,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
   async createOrUpdateQuestion (req: any, res: any, next: any): Promise<any> {
     try {
       const data: Question = req.body
@@ -143,8 +159,8 @@ class Quiz extends BaseController {
 
       const { token } = req.headers
       const isValidToken = TokenService.verifyToken(token)
-      
-      const data = { pid: Number(req.query.pid) }
+      const pid = Number(req.query.pid)
+      const data = { pid }
       const questions = await QuizService.getQuestions(data, isValidToken)
 
       res.json({

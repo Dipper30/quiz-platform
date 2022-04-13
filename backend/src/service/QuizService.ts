@@ -96,6 +96,18 @@ class Quiz extends BaseService {
     }
   }
 
+  async deleteQuiz (qid: number) {
+    try {
+      const quiz = await QuizModel.findByPk(qid)
+      if (!quiz) throw new QuizException(errCode.QUIZ_ERROR, 'Quiz Not Found.')
+      quiz.destroyed = true
+      await quiz.save()
+      return true
+    } catch (error) {
+      return error
+    }
+  }
+
   async getQuizzes (sort: string = 'create') {
     if (!sort) sort = 'create'
     try {
@@ -118,7 +130,7 @@ class Quiz extends BaseService {
   
   async createQuestion (data: Question) {
     try {
-      const { description, seq, isMulti, partId, imgSrc } = data
+      const { description, isMulti, partId, imgSrc, choices } = data
 
       const ifPartExists = await PartModel.findByPk(partId)
       if (!ifPartExists) throw new QuizException(errCode.QUIZ_ERROR, 'Part does not exist.')
@@ -127,11 +139,9 @@ class Quiz extends BaseService {
       const priorQuestions = await QuestionModel.findAll({
         where: { part_id: partId, destroyed: false },
       })
-      if (priorQuestions && priorQuestions.find((q: any) => q.seq == seq)) {
-        throw new QuizException(errCode.QUIZ_ERROR, 'Duplicate Seq Number!')
-      }
+      const seq = this.findMaxSeq(priorQuestions) + 1
 
-      const newQuestion = await QuestionModel.create({
+      const questionModel = await QuestionModel.create({
         description,
         seq,
         is_multi: isMulti,
@@ -140,7 +150,29 @@ class Quiz extends BaseService {
         imgSrc: imgSrc || null,
       })
 
-      return omitFields(newQuestion.dataValues, ['destroyed'], true)
+      const qid = questionModel.id
+      const newQuestion = questionModel.dataValues
+      newQuestion.choices = []
+      let choiceSeq = this.findMaxSeq(priorQuestions) + 1
+      for (let index = 0; index < choices.length; index++) {
+        const choice = choices[index]
+        // make sure the sequence number is unique
+        const priorChoices = await ChoiceModel.findAll({
+          where: { question_id: qid, destroyed: false },
+        })
+        
+        const choiceModel = await ChoiceModel.create({
+          seq: choiceSeq++,
+          description: choice.description,
+          score: choice.score,
+          question_id: qid,
+          destroyed: false,
+        })
+
+        newQuestion.choices.push(choiceModel.dataValues)
+      }
+
+      return newQuestion
     } catch (error) {
       return error
     }
@@ -196,33 +228,33 @@ class Quiz extends BaseService {
   }
 
   async createChoice (data: Choice) {
-    try {
-      const { description, seq, questionId, score } = data
-      const ifQuestionExists = await QuestionModel.findByPk(questionId)
+    // try {
+    //   const { description, questionId, score } = data
+    //   const ifQuestionExists = await QuestionModel.findByPk(questionId)
       
-      if (!ifQuestionExists) throw new QuizException(errCode.QUIZ_ERROR, 'Question does not exist.')
+    //   if (!ifQuestionExists) throw new QuizException(errCode.QUIZ_ERROR, 'Question does not exist.')
 
-      // make sure the sequence number is unique
-      const priorChoices = await ChoiceModel.findAll({
-        where: { question_id: questionId, destroyed: false },
-      })
-      if (priorChoices && priorChoices.find((c: any) => c.seq == seq)) {
-        throw new QuizException(errCode.QUIZ_ERROR, 'Duplicate Seq Number!')
-      }
+    //   // make sure the sequence number is unique
+    //   const priorChoices = await ChoiceModel.findAll({
+    //     where: { question_id: questionId, destroyed: false },
+    //   })
+    //   if (priorChoices && priorChoices.find((c: any) => c.seq == seq)) {
+    //     throw new QuizException(errCode.QUIZ_ERROR, 'Duplicate Seq Number!')
+    //   }
 
-      const newChoice = await ChoiceModel.create({
-        description,
-        seq,
-        question_id: questionId,
-        destroyed: false,
-        score,
-      })
+    //   const newChoice = await ChoiceModel.create({
+    //     description,
+    //     seq,
+    //     question_id: questionId,
+    //     destroyed: false,
+    //     score,
+    //   })
 
-      return omitFields(newChoice.dataValues, ['destroyed'], true)
+    //   return omitFields(newChoice.dataValues, ['destroyed'], true)
 
-    } catch (error) {
-      return error
-    }
+    // } catch (error) {
+    //   return error
+    // }
   }
 
   async updateChoice (data: Choice) {
@@ -375,6 +407,13 @@ class Quiz extends BaseService {
     }
   }
 
+  findMaxSeq (arr: any[]): number {
+    let max = 0
+    arr.map(v => {
+      if (v.seq > max) max = v.seq
+    })
+    return max
+  }
 }
 
 export default new Quiz()

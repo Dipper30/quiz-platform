@@ -66,3 +66,21 @@ interface APIResponse {
   msg: string,
   data: any,
 }
+
+interface Question {
+  id?: number,
+  description: string,
+  seq: number,
+  partId?: number,
+  isMulti: boolean,
+  imgSrc?: string | null,
+  choices: Choice[],
+}
+
+interface Choice {
+  id?: number,
+  description: string,
+  seq: number,
+  score: number,
+  questionId?: number,
+}

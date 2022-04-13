@@ -63,7 +63,6 @@ const QuizDetail: React.FC<QuizDetailProps> = (props) => {
     <div className='admin-quiz-detail-container'>
       <QuizAbstract clickable={false} quiz={quiz} withDomain={true} />
       { partDetailList }
-      <div style={{height: '2000px'}}></div>
     </div>
   )
 }

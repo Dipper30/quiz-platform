@@ -36,15 +36,22 @@
     }
   }
   .question-list-container {
-    height: 600px;
-    background-color: @blue;
     width: 100%;
     border-radius: 5px;
-    &:hover {
-      background-color: @light-hover;
-    }
+    // &:hover {
+    //   background-color: @light-hover;
+    // }
+    // :hover {
+      
+    // }
     .question-container {
-      height: 50px;
+      padding: 5px 10px;
+      border-radius: 10px;
+      background-color: @hover;
+      border: dashed 1px;
+      &:hover {
+        background-color: @light-hover;
+      }
     }
   }
 }

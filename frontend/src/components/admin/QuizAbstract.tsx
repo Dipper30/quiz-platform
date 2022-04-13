@@ -1,20 +1,37 @@
 import { Quiz as QuizType } from '../../vite-env'
-import { Tag } from 'antd'
-import { useMemo } from 'react'
+import { Tag, Button } from 'antd'
+import api from '../../http'
 import { useNavigate } from 'react-router-dom'
+import { handleResult, warningMessage } from '../../utils'
+import { useState } from 'react'
 
 type QuizAbstractProps = {
   quiz: QuizType,
   clickable: boolean,
   withDomain: boolean,
+  deleted?: () => void,
 }
 
 const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
 
   const navagate = useNavigate()
+  const [lock, setLock] = useState<boolean>(false)
 
   const onQuizDetail = () => {
     props.clickable && navagate(`/admin/quiz/${props.quiz.id}`)
+  }
+
+  const onDelete = async (e: any) => {
+    e.stopPropagation()
+    if (lock) {
+      warningMessage('Wait a Sec')
+      return
+    }
+    setLock(true)
+    const deleted = await api.deleteQuiz(props.quiz.id)
+    setLock(false)
+    if (!handleResult(deleted)) return
+    props.deleted && props.deleted()
   }
 
   return (
@@ -28,6 +45,9 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
       <div className='header'>
         <div> {props.quiz.title} </div>
         { props.quiz.tag && <Tag color='geekblue'> { props.quiz.tag } </Tag> }
+        { !props.withDomain &&
+          <Button danger className='delete-btn' onClick={onDelete}> Delete </Button>
+        }
       </div>
        
       <div className='row'>
@@ -41,7 +61,6 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
       <div className='row'>
         { `Descriptions: ${props.quiz.description}` } 
       </div>
-
       {
         props.withDomain &&
         props.quiz.domains.map(domain => (
