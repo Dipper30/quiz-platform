@@ -23,8 +23,14 @@ interface Quiz {
   tag: string,
   description: string,
   totalPoints: number,
-  domains: Domain[],
+  sections: Section[],
   [key: string]: any,
+}
+
+interface Section {
+  id?: number,
+  title: string,
+  domains: Domain[],
 }
 
 interface Domain {
@@ -46,6 +52,7 @@ interface Part {
   totalPoints?: number,
   domainName?: string,
   name?: string,
+  sectionName?: string
 }
 
 interface PartChoice {
@@ -53,6 +60,7 @@ interface PartChoice {
   description: string,
   willShowSubQuestions: boolean,
   seq: number,
+  show_sub?: boolean,
 }
 interface Recommendation {
   id?: number,
@@ -75,6 +83,7 @@ interface Question {
   isMulti: boolean,
   imgSrc?: string | null,
   choices: Choice[],
+  partChoices?: any[],
 }
 
 interface Choice {

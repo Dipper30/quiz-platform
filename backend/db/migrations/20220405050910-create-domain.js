@@ -17,7 +17,7 @@ module.exports = {
       proportion: {
         type: Sequelize.INTEGER
       },
-      quiz_id: {
+      section_id: {
         type: Sequelize.INTEGER
       },
       createdAt: {

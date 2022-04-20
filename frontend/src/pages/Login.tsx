@@ -29,6 +29,8 @@ const Login: React.FC = (props: any) => {
       password,
     }
     const res: any = await api.login(p)
+    setLock(false)
+    clearTimeout(timer)
     if (handleResult(res)) {
       const { data } = res
       props.setUser(data.user)
@@ -36,8 +38,6 @@ const Login: React.FC = (props: any) => {
       setLocalStorage('uid', data.user.id)
       navigate('/admin')
     }
-    setLock(false)
-    clearTimeout(timer)
   }
 
   const handleEnterKeyDown = (e: any): void => {

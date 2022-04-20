@@ -32,6 +32,12 @@ export interface InitQuiz {
   tag?: String,
   description: String,
   total_points: Number,
+  sections: Section[],
+}
+
+export interface Section {
+  id?: Number,
+  title: String,
   domains: Domain[],
 }
 
@@ -40,8 +46,10 @@ export interface Question {
   description: String,
   seq: Number, // if rewrite, validate the sequence
   isMulti: Boolean, // indicates if user can select more than one choices
-  partId: Number,
+  partchoiceId: Number,
   imgSrc: String | null,
+  partId: Number,
+  partChoices: Number[],
   choices: Choice[],
 }
 
@@ -59,5 +67,5 @@ export interface GetQuiz {
   tag: String,
   description: String,
   total_points: Number,
-  domains: Domain[],
+  sections: Section[],
 }

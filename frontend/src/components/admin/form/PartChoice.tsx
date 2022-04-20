@@ -28,7 +28,7 @@ const PartChoice: React.FC<PartChoiceProps> = (props) => {
 
   return (
     <div className='admin-partchoice-container'>
-      <Input placeholder='choice descriptions here' defaultValue={props.choice.description} onInput={(e: any) => updateChoiceInfo('domainName', e.target.value)} />
+      <Input placeholder='choice descriptions here' defaultValue={props.choice.description} onInput={(e: any) => updateChoiceInfo('description', e.target.value)} />
       <Checkbox onChange={(e: any) => updateChoiceInfo('willShowSubQuestions', e.target.checked)}> Show Sub Questions </Checkbox>
       { props.choice.willShowSubQuestions }
       <MinusCircleOutlined className='delete-btn icon-btn' onClick={() => props.deleteChoice(props.choice.seq)} />

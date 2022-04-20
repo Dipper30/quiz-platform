@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
-import { Choice, Question } from '../../vite-env'
+import { useEffect, useMemo, useState } from 'react'
+import { Choice, Part, PartChoice, Question } from '../../vite-env'
 import { Input, InputNumber, Button, Checkbox } from 'antd'
 import { deepClone, errorMessage, handleResult } from '../../utils'
 import { CloseCircleOutlined } from '@ant-design/icons'
 import api from '../../http'
 import './CreateQuestion.less'
+import { choiceSeq } from '../../config/choices'
 
 const { TextArea } = Input
 
@@ -72,7 +73,7 @@ export const CreateChoice: React.FC<CreateChoiceProps> = (props) => {
 }
 
 type CreateQuestionProps = {
-  partId: number,
+  part: Part,
   createQuestion: () => void,
   resize?: () => void,
   update: (question: Question) => void,
@@ -102,11 +103,13 @@ const initQuestion: Question = {
 export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
 
   const [question, setQuestion] = useState<Question>(initQuestion)
+  const [associates, setAssociates] = useState<number[]>([])
   const [init, setInit] = useState<boolean>(false)
   const [lock, setLock] = useState<boolean>(false)
 
+  const availablePartChoices = useMemo(() => props.part.choices.map((c: PartChoice, index: number) => ({ alpha: choiceSeq[index + 1], id: c.id, show_sub: c.show_sub })).filter((c: any) => c.show_sub), [props.part])
+
   const updateQuestionInfo = (key: string, value: any) => {
-    console.log(value)
     switch (key) {
       case 'description':
         question.description = value
@@ -148,8 +151,16 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     props.resize && props.resize()
   }
 
+  const updateAssociatedPartChoice = (seq: number, checked: boolean) => {
+    if (!checked) setAssociates(associates.filter((a) => a != seq))
+    else setAssociates([...associates, seq])
+  }
+
   const onSubmit = async () => {
-    question.partId = props.partId
+    console.log(associates)
+
+    question.partId = props.part.id
+    question.partChoices = associates
     if (lock || !validate()) return
     setLock(true)
     const res = await api.createQuestion(question)
@@ -198,9 +209,17 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
         (
           <div>
             <div className='row'>
-              Question has more than one correct choice ? &nbsp;
-              {/* TODO debounce */}
+              More than one correct choice ? &nbsp;
               <Checkbox checked={question.isMulti} onChange={(e: any) => updateQuestionInfo('isMulti', e.target.checked)} />
+            </div>
+            <div className='row'>
+              Associate with ? &nbsp;
+              {
+                availablePartChoices &&
+                availablePartChoices.map((c: any) => (
+                  <span key={c.id}> { c.alpha } <Checkbox onChange={(e: any) => updateAssociatedPartChoice(c.id, e.target.checked)} />  &nbsp; &nbsp; &nbsp; </span>
+                ))
+              }
             </div>
             <TextArea
               rows={4}

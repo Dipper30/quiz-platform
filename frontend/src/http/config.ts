@@ -25,15 +25,16 @@ export const getQuizById = (id: number) => {
   return get(`quiz/${id}`)
 }
 
-export const getQuestionsByPartId = (id: number) => {
-  return get('questions', { pid: id })
+export const getQuestionsByPartId = (pid: number, pcid: number = 0) => {
+  return get('questions', { pid, pcid })
 }
 
 export const createQuestion = (question: Question) => {
   return post('question', {
     isMulti: question.isMulti,
     description: question.description,
-    partId: question.partId,
+    partChoices: question.partChoices,
     choices: question.choices,
+    partId: question.partId,
   })
 }

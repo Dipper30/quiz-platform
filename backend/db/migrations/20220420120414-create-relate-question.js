@@ -1,23 +1,17 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Parts', {
+    await queryInterface.createTable('RelateQuestions', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING
-      },
-      destroyed: {
-        type: Sequelize.BOOLEAN
-      },
-      domain_id: {
+      question_id: {
         type: Sequelize.INTEGER
       },
-      seq: {
+      partchoice_id: {
         type: Sequelize.INTEGER
       },
       createdAt: {
@@ -31,6 +25,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Parts');
+    await queryInterface.dropTable('RelateQuestions');
   }
 };

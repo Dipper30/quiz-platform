@@ -1,4 +1,4 @@
-import { Quiz as QuizType } from '../../vite-env'
+import { Quiz as QuizType, Section } from '../../vite-env'
 import { Tag, Button } from 'antd'
 import api from '../../http'
 import { useNavigate } from 'react-router-dom'
@@ -62,12 +62,23 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
         { `Descriptions: ${props.quiz.description}` } 
       </div>
       {
-        props.withDomain &&
-        props.quiz.domains.map(domain => (
-          <div className='domain-container' key={domain.id}>
-            <span className='domain-name'>{ domain.name }</span> &nbsp; <span>{ domain.proportion } %</span> 
-          </div>
-        ))
+        props.withDomain && props.quiz?.sections?.length > 0 &&
+        (
+          props.quiz.sections.map((section: Section) => (
+            <div key={section.id} className='proportion-list'>
+              <div className='section-title'> {section.title }</div>
+              <div className="domains">
+                {
+                  section.domains?.map(domain => (
+                    <div className='domain-container' key={domain.id}>
+                      <span className='domain-name'>{ domain.name }</span> &nbsp; <span>{ domain.proportion } %</span> 
+                    </div>
+                  )) || []
+                }
+              </div>
+            </div>
+          ))
+        )
       }
     </div>
 

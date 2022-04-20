@@ -101,11 +101,24 @@ IF NOT EXISTS Users (
 CREATE TABLE
 IF NOT EXISTS Quizzes (
 	id INT NOT NULL PRIMARY KEY,
-	title VARCHAR ( 255 ),# Quiz title
-	tag VARCHAR ( 36 ),# Quiz tag, which will not be exposed to users. This field can be seen as a comment, eg 'tag quiz version1', 'quiz for new grads'.
-	description VARCHAR ( 255 ),# descriptions for the Quiz
-	total_points INT,# a positive integer, usually set to 100
-	detroyed boolean NOT NULL 
+	title VARCHAR ( 255 ), # Quiz title
+	tag VARCHAR ( 36 ) ,# Quiz tag, which will not be exposed to users. This field can be seen as a comment, eg 'tag quiz version1', 'quiz for new grads'.
+	description VARCHAR ( 255 ) ,# descriptions for the Quiz
+	total_points INT, # a positive integer, usually set to 100
+	destroyed boolean NOT NULL 
+)
+```
+
+### Sections
+
+```sql
+CREATE TABLE
+IF NOT EXISTS Sections (
+	id INT NOT NULL PRIMARY KEY,
+	title VARCHAR ( 255 ), # Section title
+  quiz_id INT,
+	destroyed boolean NOT NULL ,
+  FOREIGN KEY ( quiz_id ) REFERENCES Quizzes ( id ) 
 )
 ```
 
@@ -117,10 +130,10 @@ IF NOT EXISTS Domains (
 	id INT PRIMARY KEY NOT NULL,
 	NAME VARCHAR ( 255 ) NOT NULL,
 	proportion INT NOT NULL,
-	quiz_id INT NOT NULL,
+	section_id INT NOT NULL,
 	createAt char(10), # 10-digit unix TIMESTAMP
 	updateAt char(10),
-	FOREIGN KEY ( quiz_id ) REFERENCES Quizzes ( id ) 
+	FOREIGN KEY ( section_id ) REFERENCES Sections ( id ) 
 )
 ```
 
@@ -131,7 +144,7 @@ CREATE TABLE
 IF NOT EXISTS Parts (# eg. Python, R
 	id INT NOT NULL PRIMARY KEY,
 	NAME VARCHAR ( 255 ),
-	description VARCHAR ( 255 ),# descriptions for the Quiz
+  seq INT,
 	destroyed boolean NOT NULL,
 	createAt CHAR ( 10 ),# 10-digit unix TIMESTAMP
 	updateAt CHAR ( 10 ),
@@ -179,11 +192,24 @@ IF NOT EXISTS Questions (
 	id INT NOT NULL PRIMARY KEY,
 	description VARCHAR ( 1023 ) NOT NULL,# the problem descriptions
 	seq INT,
-	destroyed boolean,# indicates whether this question is detroyed, or whether it is visible for users
+	destroyed boolean,# indicates whether this question is destroyed, or whether it is visible for users
 	is_multi, boolean,# indicates if user can select more than one choices
 	part_id INT,
   img_src TEXT,
-	FOREIGN KEY ( part_id ) REFERENCES Parts ( id ) 
+	FOREIGN KEY ( partchoice_id ) REFERENCES PartChoices ( id )
+)
+```
+
+### RelateQuestions
+
+```sql
+CREATE TABLE
+IF NOT EXISTS RelateQuestions (
+	id INT NOT NULL PRIMARY KEY,
+  question_id INT,
+  partchoice_id INT,
+  FOREIGN KEY ( question_id ) REFERENCES Questions ( id )
+  FOREIGN KEY ( partchoice_id ) REFERENCES PartChoices ( id )
 )
 ```
 

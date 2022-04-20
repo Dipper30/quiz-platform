@@ -38,29 +38,34 @@
     tag?: String,
     description: String,
     total_points: Number,
-    domains: [
+    sections: [
       {
-        domainName: String,
-        proportion: Number,
-        seq: Number,
-        parts: [
-          partName: String,
-          seq: Number,
-          choices: [
-            {
-              description: String,
-              willShowSubQuestions: Boolean,
+        title: String,
+        domains: [
+          {
+            domainName: String,
+            proportion: Number,
+            seq: Number,
+            parts: [
+              partName: String,
               seq: Number,
-            }
-          ],
-          recommendations: [
-            {
-              showUnder: Number,
-              link: String,
-            }
-          ]
-        ]
-      }
+              choices: [
+                {
+                  description: String,
+                  willShowSubQuestions: Boolean,
+                  seq: Number,
+                }
+              ],
+              recommendations: [
+                {
+                  showUnder: Number,
+                  link: String,
+                }
+              ]
+            ]
+          }
+        ],
+      },
     ]
   },
   header: {
@@ -97,28 +102,31 @@
           tag?: String,
           description: String,
           totalPoints: Number,
-          domains: [
-            {
-              domainName: String,
-              proportion: Number,
-              parts: [
-                partName: String,
-                choices: [
-                  {
-                    description: String,
-                    willShowSubQuestions: Boolean,
-                  }
-                ],
-                recommendations: [
-                  {
-                    score: Number,
-                    link: String,
-                  }
+          sections: [
+            title: String,
+            domains: [
+              {
+                domainName: String,
+                proportion: Number,
+                parts: [
+                  partName: String,
+                  choices: [
+                    {
+                      description: String,
+                      willShowSubQuestions: Boolean,
+                    }
+                  ],
+                  recommendations: [
+                    {
+                      score: Number,
+                      link: String,
+                    }
+                  ]
                 ]
-              ]
-            }
-          ]
-        }
+              }
+            ]
+          ],
+        },
       ]
     }
   },
@@ -144,7 +152,6 @@
       tag?: String,
       description: String,
       total_points: Number,
-
     }
   },
   return_fail: {
@@ -158,7 +165,7 @@
 
 ```ts
 {
-  url: 'questions?pid=[part_id]',
+  url: 'questions?pid=[part_id]&pcid=[partchoice_id]',
   method: 'get',
   header: {
     token: String, // show choice scores with token, otherwise hide scores
@@ -173,15 +180,22 @@
           id: Number,
           description: String,
           seq: Number,
-          isMulti: Boolean,
-          partId: Number,
+          is_multi: Boolean,
+          part_id: Number,
           imgSrc: String | NULL,
+          partChoices: [
+            id: Number,
+            description: String,
+            seq: Number,
+            show_sub: Boolean,
+            
+          ],
           choices: [
             {
               id: Number,
               seq: Number,
               description: String,
-              questionId: Number,
+              question_id: Number,
               score?: Number, // this field should be invisible to users
             }
           ]
@@ -196,18 +210,24 @@
 }
 ```
 
-### Add/Update Question
+### Add Question
 
 ```ts
 {
   url: 'question',
   method: 'post',
   param: {
-    id?: Number, // if undefined, new question will be added, otherwise rewrite
     description: String,
     seq: Number, // if rewrite, validate the sequence
     isMulti: Boolean, // indicates if user can select more than one choices
     partId: Number,
+    partChoices: Number[],
+    choices: [
+      {
+        description: String,
+        score: Number,
+      }
+    ],
     imgSrc: String | NULL,
   },
   header: {
@@ -217,13 +237,6 @@
     code: 201,
     msg: 'ok',
     data: {
-      quiz: {
-        id: Number,
-        description: String,
-        seq: Number,
-        is_multi: Boolean,
-        part_id: Number,
-      },
     }
   },
   return_fail: {

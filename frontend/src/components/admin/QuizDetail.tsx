@@ -11,12 +11,13 @@ type QuizDetailProps = {
   
 }
 
+
 const initQuiz: Quiz = {
   title: '',
   tag: '',
   description: 'descriptions...',
   totalPoints: 100,
-  domains: [],
+  sections: [],
 }
 
 const QuizDetail: React.FC<QuizDetailProps> = (props) => {
@@ -29,7 +30,6 @@ const QuizDetail: React.FC<QuizDetailProps> = (props) => {
     const res = await api.getQuizById(id)
     if (!handleResult(res, false)) return
     setQuiz(res.data.quiz)
-    console.log(quiz)
   }
 
   useEffect(() => {
@@ -43,20 +43,26 @@ const QuizDetail: React.FC<QuizDetailProps> = (props) => {
 
   const getParts = () => {
     let parts: Part[] = []
-    for (const domain of quiz.domains) {
-      domain.parts.map(p => p.domainName = domain.name)
-      parts = [ ...parts, ...domain.parts]
+    if (!quiz?.sections) return []
+    for (const section of quiz.sections) {
+      for (const domain of section.domains) {
+        domain.parts.map(p => {
+          p.domainName = domain.name
+          p.sectionName = section.title
+        })
+        parts = [ ...parts, ...domain.parts]
+      }
     }
     return parts
   }
 
-  const partDetailList = parts.map(part =>
+  const partDetailList = parts?.map(part =>
     <PartDetail
       key={part.id}
       part={part}
       editing='editing'
     // eslint-disable-next-line comma-dangle
-    />
+    /> || []
   )
 
   return (

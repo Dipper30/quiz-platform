@@ -17,6 +17,8 @@ const {
   Recommendation: RecommendationModel,
   Question: QuestionModel,
   Choice: ChoiceModel,
+  Section: SectionModel,
+  RelateQuestion: RelateQuestionModel,
 } = models
 
 class Quiz extends BaseService {
@@ -27,7 +29,7 @@ class Quiz extends BaseService {
 
   async initQuiz (data: InitQuiz) {
     const t = await sequelize.transaction()
-    const { domains } = data
+    const { sections } = data
 
     try {
       // create quiz
@@ -41,50 +43,64 @@ class Quiz extends BaseService {
 
       const qid = newQuiz.id
 
-      // create domains
+      // create sections
 
-      for (let dIndex = 0; dIndex < domains.length; dIndex++) {
-        const domain = domains[dIndex]
-        const domainModel = await DomainModel.create({
-          name: domain.domainName,
-          proportion: domain.proportion,
-          seq: domain.seq,
+      for (let sIndex = 0; sIndex < sections.length; sIndex++) {
+        const section = sections[sIndex]
+        const sectionModel = await SectionModel.create({
+          title: section.title,
           quiz_id: qid,
+          destroyed: false,
         }, { transaction: t })
 
-        const domainId = domainModel.id
-        const { parts } = domain
+        const sectionId = sectionModel.id
+        const { domains } = section
 
-        // append parts
-        for (let pIndex = 0; pIndex < parts.length; pIndex++) {
-          const part = parts[pIndex]
-          const partModel = await PartModel.create({
-            name: part.partName,
-            seq: part.seq,
-            destroyed: false,
-            domain_id: domainId,
+        // create domains
+
+        for (let dIndex = 0; dIndex < domains.length; dIndex++) {
+          const domain = domains[dIndex]
+          const domainModel = await DomainModel.create({
+            name: domain.domainName,
+            proportion: domain.proportion,
+            seq: domain.seq,
+            section_id: sectionId,
           }, { transaction: t })
 
-          const partId = partModel.id
+          const domainId = domainModel.id
+          const { parts } = domain
 
-          // append choices and recommendaitons
-          const { choices, recommendations } = part
-          await PartChoiceModel.bulkCreate(
-            choices.map(choice => ({
-              description: choice.description,
-              show_sub: choice.willShowSubQuestions,
-              seq: choice.seq,
-              part_id: partId
-            })), { transaction: t }
-          )
-          await RecommendationModel.bulkCreate(
-            recommendations.map(recommendation => ({
-              show_under: recommendation.showUnder,
-              link: recommendation.link,
-              part_id: partId,
-            })), { transaction: t }
-          )
+          // append parts
+          for (let pIndex = 0; pIndex < parts.length; pIndex++) {
+            const part = parts[pIndex]
+            const partModel = await PartModel.create({
+              name: part.partName,
+              seq: part.seq,
+              destroyed: false,
+              domain_id: domainId,
+            }, { transaction: t })
 
+            const partId = partModel.id
+
+            // append choices and recommendaitons
+            const { choices, recommendations } = part
+            await PartChoiceModel.bulkCreate(
+              choices.map(choice => ({
+                description: choice.description,
+                show_sub: choice.willShowSubQuestions,
+                seq: choice.seq,
+                part_id: partId
+              })), { transaction: t }
+            )
+            await RecommendationModel.bulkCreate(
+              recommendations.map(recommendation => ({
+                show_under: recommendation.showUnder,
+                link: recommendation.link,
+                part_id: partId,
+              })), { transaction: t }
+            )
+
+          }
         }
       }
 
@@ -108,6 +124,11 @@ class Quiz extends BaseService {
     }
   }
 
+  /**
+   * return all undestroyed quizzes with only their own attributes
+   * @param {string} sort, default sorted by 'create' 
+   * @returns 
+   */
   async getQuizzes (sort: string = 'create') {
     if (!sort) sort = 'create'
     try {
@@ -129,11 +150,13 @@ class Quiz extends BaseService {
   }
   
   async createQuestion (data: Question) {
-    try {
-      const { description, isMulti, partId, imgSrc, choices } = data
+    const t = await sequelize.transaction()
 
-      const ifPartExists = await PartModel.findByPk(partId)
-      if (!ifPartExists) throw new QuizException(errCode.QUIZ_ERROR, 'Part does not exist.')
+    try {
+      const { description, isMulti, partId, partChoices, imgSrc, choices } = data
+
+      const ifExists = await PartChoiceModel.findByPk(partId)
+      if (!ifExists) throw new QuizException(errCode.QUIZ_ERROR, 'Part does not exist.')
 
       // make sure the sequence number is unique
       const priorQuestions = await QuestionModel.findAll({
@@ -148,53 +171,65 @@ class Quiz extends BaseService {
         part_id: partId,
         destroyed: false,
         imgSrc: imgSrc || null,
-      })
+      }, { transaction: t })
 
       const qid = questionModel.id
+      
+      for (let partchoiceId of partChoices) {
+        await RelateQuestionModel.create({
+          question_id: qid,
+          partchoice_id: partchoiceId,
+        }, { transaction: t })
+      }
+
       const newQuestion = questionModel.dataValues
       newQuestion.choices = []
-      let choiceSeq = this.findMaxSeq(priorQuestions) + 1
+
+      // make sure the sequence number is unique
+      // const priorChoices = await ChoiceModel.findAll({
+      //   where: { part_id: partId, destroyed: false },
+      // })
+      // let choiceSeq = this.findMaxSeq(priorChoices) + 1
+
+      let choiceSeq = 1
+
       for (let index = 0; index < choices.length; index++) {
         const choice = choices[index]
-        // make sure the sequence number is unique
-        const priorChoices = await ChoiceModel.findAll({
-          where: { question_id: qid, destroyed: false },
-        })
-        
         const choiceModel = await ChoiceModel.create({
           seq: choiceSeq++,
           description: choice.description,
           score: choice.score,
           question_id: qid,
           destroyed: false,
-        })
+        }, { transaction: t })
 
         newQuestion.choices.push(choiceModel.dataValues)
       }
-
+      await t.commit()
       return newQuestion
     } catch (error) {
+      await t.rollback()
       return error
     }
   }
 
   async updateQuestion (data: Question) {
     try {
-      const { id, description, seq, isMulti, partId, imgSrc } = data
+      const { id, description, seq, isMulti, partchoiceId, imgSrc } = data
       const question = await QuestionModel.findByPk(id)
       if (!question) throw new QuizException(errCode.QUIZ_ERROR, 'Question not exists.')
 
       // check if partId is changed
-      if (!isEmptyValue(partId)) {
-        const ifPartExists = await PartModel.findByPk(partId)
-        if (!ifPartExists) throw new QuizException(errCode.QUIZ_ERROR, 'Part does not exist.')
-        question.part_id = partId
+      if (!isEmptyValue(partchoiceId)) {
+        const ifExists = await PartModel.findByPk(partchoiceId)
+        if (!ifExists) throw new QuizException(errCode.QUIZ_ERROR, 'Part does not exist.')
+        question.partchoice_id = partchoiceId
       }
 
       // make sure the sequence number is unique
       if (!isEmptyValue(seq)) {
         const priorQuestions = await QuestionModel.findAll({
-          where: { part_id: question.part_id, destroyed: false },
+          where: { partchoice_id: question.partchoice_id, destroyed: false },
         })
         if (priorQuestions && priorQuestions.find((q: any) => q.seq == seq && q.id != question.id)) {
           throw new QuizException(errCode.QUIZ_ERROR, 'Duplicate Seq Number!')
@@ -271,6 +306,11 @@ class Quiz extends BaseService {
       }
 
       // make sure the sequence number is unique
+      // const priorChoices = await ChoiceModel.findAll({
+      //   where: { part_id: partId, destroyed: false },
+      // })
+      // let choiceSeq = this.findMaxSeq(priorChoices) + 1
+      // make sure the sequence number is unique
       if (!isEmptyValue(seq)) {
         const priorChoices = await ChoiceModel.findAll({
           where: { question_id: choice.question_id, destroyed: false },
@@ -318,73 +358,113 @@ class Quiz extends BaseService {
 
       const quiz: GetQuiz = quizModel.dataValues
 
-      const domainModels = await DomainModel.findAll({
+      const sectionModels = await SectionModel.findAll({
         where: { quiz_id: quiz.id },
         attributes: { exclude: this.excludeAttributes },
       })
 
-      // append domains to quiz
-      quiz.domains = domainModels.map((v: any) => v.dataValues)
-      
-      // append parts to each domain
-      for (let index = 0; index < quiz.domains.length; index++) {
-        const domain = quiz.domains[index]
-        const partModels = await PartModel.findAll({
-          where: { domain_id: domain.id },
+      // append sections to quiz
+      quiz.sections = sectionModels.map((v: any) => v.dataValues)
+
+      for (let sIndex = 0; sIndex < quiz.sections.length; sIndex++) {
+        const section = quiz.sections[sIndex]
+        const domainModels = await DomainModel.findAll({
+          where: { section_id: section.id },
           attributes: { exclude: this.excludeAttributes },
         })
-        domain.parts = partModels.map((v: any) => v.dataValues)
 
-        for (let pIndex = 0; pIndex < domain.parts.length; pIndex++) {
-          const part = domain.parts[pIndex]
+        // append domains to quiz
+        section.domains = domainModels.map((v: any) => v.dataValues)
 
-          // calculate total points
-          const questionModels = await QuestionModel.findAll({
-            where: { part_id: part.id },
-            attributes: { include: ['id'] },
+        // append parts to each domain
+        for (let index = 0; index < section.domains.length; index++) {
+          const domain = section.domains[index]
+          const partModels = await PartModel.findAll({
+            where: { domain_id: domain.id },
+            attributes: { exclude: this.excludeAttributes },
           })
-          let sum = 0
-          for (let qIndex = 0; qIndex < questionModels.length; qIndex++) {
-            const qid = questionModels[qIndex].id
-            const total = await ChoiceModel.getTotalPointsByQuestionId(qid)
-            sum += total
+          domain.parts = partModels.map((v: any) => v.dataValues)
+
+          for (let pIndex = 0; pIndex < domain.parts.length; pIndex++) {
+            const part = domain.parts[pIndex]
+            
+            // calculate total points
+            const questionModels = await QuestionModel.findAll({
+              where: { part_id: part.id },
+              attributes: { include: ['id'] },
+            })
+            let sum = 0
+            for (let qIndex = 0; qIndex < questionModels.length; qIndex++) {
+              const qid = questionModels[qIndex].id
+              const total = await ChoiceModel.getTotalPointsByQuestionId(qid)
+              sum += total
+            }
+            part.totalPoints = sum
+
+            // append choices and recommendations to each part
+            const partChoiceModels = await PartChoiceModel.findAll({
+              where: { part_id: part.id },
+              attributes: { exclude: this.excludeAttributes },
+            })
+            const recommendationModels = await RecommendationModel.findAll({
+              where: { part_id: part.id },
+              attributes: { exclude: this.excludeAttributes },
+            })
+            part.choices = partChoiceModels.map((v: any) => v.dataValues)
+            part.recommendations = recommendationModels.map((v: any) => v.dataValues)
           }
-          part.totalPoints = sum
-
-          // append choices and recommendations to each part
-          const partChoiceModels = await PartChoiceModel.findAll({
-            where: { part_id: part.id },
-            attributes: { exclude: this.excludeAttributes },
-          })
-          const recommendationModels = await RecommendationModel.findAll({
-            where: { part_id: part.id },
-            attributes: { exclude: this.excludeAttributes },
-          })
-          part.choices = partChoiceModels.map((v: any) => v.dataValues)
-          part.recommendations = recommendationModels.map((v: any) => v.dataValues)
         }
       }
-      
+
       return quiz
     } catch (error) {
       return error
     }
   }
 
-  async getQuestions (data: { pid: Number }, withAuth: Boolean = false, showDestroyed: Boolean = false) {
+  async getQuestions (data: { pid: Number, pcid: Number }, withAuth: Boolean = false, showDestroyed: Boolean = false) {
     try {
-      const { pid } = data
-      
-      const questionModels = await QuestionModel.findAll({
-        where: { part_id: pid, destroyed: false },
-        attributes: { exclude: this.excludeAttributes },
-      })
+      const { pid, pcid } = data
+      console.log('@@',data)
+      let questionModels
+      if (pcid) {
+        // search questions asscociated with specific part choice
+        questionModels = await RelateQuestionModel.findAll({
+          where: { partchoice_id: pcid },
+          include: [{
+            model: QuestionModel,
+              // as:"items",//返回的对象修改成一个固定的名称
+          }]
+        })
+        console.log(questionModels)
+      } else {
+        // search all questions in a part
+        questionModels = await QuestionModel.findAll({
+          where: { part_id: pid, destroyed: false },
+          attributes: { exclude: this.excludeAttributes },
+        })
+      }
 
       const questions: Question[] = questionModels?.map((question: any) => question.dataValues)
-      
+
       // append choices to each question
       for (let index = 0; index < questions.length; index++) {
         const question = questions[index]
+
+        // show what part choice the question is associated with
+        const relations: any = await RelateQuestionModel.findAll({
+          where: { question_id: question.id },
+        })
+        let partchoices: number[] = []
+        relations && relations.map((r: any) => {
+          partchoices.push(r.dataValues.partchoice_id)
+        })
+        const partChoiceModels = await PartChoiceModel.findAll({
+          where: { id: { [Op.in]: partchoices } },
+          attributes: { exclude: this.excludeAttributes },
+        })
+        question.partChoices = partChoiceModels ? partChoiceModels.map((v: any) => v.dataValues) : []
+
         const choiceModels = await ChoiceModel.findAll({
           where: { question_id: question.id, destroyed: false },
           attributes: { exclude: this.excludeAttributes },

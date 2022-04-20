@@ -2,8 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { Input, InputNumber, Button, Popconfirm } from 'antd'
 import './NewQuiz.less'
 import { deepClone, errorMessage, handleResult, isEmptyValue, successMessage } from '../../utils'
-import { APIResponse, Domain, Quiz } from '../../vite-env'
+import { APIResponse, Domain, Quiz, Section } from '../../vite-env'
 import DomainItem from './form/DomainItem'
+import SectionItem from './form/SectionItem'
 import api from '../../http'
 
 const { TextArea } = Input
@@ -17,18 +18,13 @@ const initQuiz: Quiz = {
   tag: '',
   description: 'descriptions...',
   totalPoints: 100,
-  domains: [],
+  sections: [],
 }
 
 const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
 
   const [quiz, setQuiz] = useState(deepClone(initQuiz))
-  const [domainId, setDomainId] = useState(Date.now())
-
-  const calculateTotalProportion = (domains: Domain[]) => {
-    return domains.reduce((pre, cur) => pre + cur.proportion, 0)
-  }
-  const currentTotalProportion = useMemo(() => calculateTotalProportion(quiz.domains), [quiz.domains])
+  const[sectionStr, setSectionStr] = useState<string>('')
 
   const updateQuizInfo = (key: string, value: any) => {
     switch (key) {
@@ -44,14 +40,28 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
       case 'description':
         quiz.description = value
         break
-      case 'domains':
-        // eslint-disable-next-line no-case-declarations
-        const { domain, seq } = value
-        quiz.domains[seq - 1] = domain
+      // case 'domains':
+      //   // eslint-disable-next-line no-case-declarations
+      //   const { domain } = value
+      //   quiz.domains[seq - 1] = domain
+      //   break
+      case 'section': // update single section
+        const { section, seq } = value
+        // const { seq } = value
+        quiz.sections[seq] = section
+        break
+      case 'sections': // update sections according to input
+        console.log(sectionStr)
+        const sections = sectionStr.split(',').map((sectionName: string) => ({ title: sectionName, domains: [] }))
+        quiz.sections = sections
         break
     }
     setQuiz(deepClone(quiz))
   }
+
+  // const initSections = (e) => {
+
+  // }
 
   const deleteDomain = (seq: number) => {
     if (seq == undefined) return
@@ -62,19 +72,6 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
     setQuiz(deepClone(quiz))
   }
 
-  const addNewDomain = () => {
-    const domain = {
-      domainName: 'new domain',
-      proportion: Math.max(100 - currentTotalProportion, 0),
-      seq: quiz.domains.length + 1,
-      id: domainId,
-      parts: [],
-    }
-    setDomainId(domainId + 1)
-    quiz.domains = [...quiz.domains, domain]
-    setQuiz(quiz)
-  }
-
   const onSubmit = async () => {
     if (!validateForm()) return
     const res: APIResponse = await api.initQuiz(quiz)
@@ -83,10 +80,16 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
     setQuiz(deepClone(initQuiz))
   }
 
+  const calculateTotalProportion = (domains: Domain[]) => {
+    return domains.reduce((pre, cur) => pre + cur.proportion, 0)
+  }
+
   const validateForm = () => {
-    if (currentTotalProportion != 100) {
-      errorMessage('Please set domain proportion to 100%.')
-      return false
+    for (const section of quiz.sections) {
+      if (calculateTotalProportion(section.domains) != 100) {
+        errorMessage('Please set domain proportion to 100%.')
+        return false
+      }
     }
     if (!quiz.title || isEmptyValue(quiz.totalPoints)) {
       errorMessage('Please input total points.')
@@ -98,6 +101,16 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
   const onReset = () => {
     setQuiz(deepClone(initQuiz))
   }
+
+  const sectionList = quiz.sections?.map((section: Section, index: number) => (
+    <SectionItem
+      // eslint-disable-next-line react/no-array-index-key
+      key={index}
+      seq={index}
+      section={section}
+      update={(section: Section, seq: number) => updateQuizInfo('section', { section, seq })}
+    />
+  ))
 
   const domainList = quiz.domains?.map((domain: Domain, index: number) => (
     <DomainItem
@@ -161,23 +174,23 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
             />
           </div>
         </div>
-      </div>
-      <div className='add-domain-container'>
-        <div className='section-divider'> Domain Count: {quiz.domains.length} &nbsp;&nbsp;&nbsp;
-          Domain Proportion: &nbsp;
-          <span className={currentTotalProportion == 100 ? 'ok' : 'error'}>
-            { currentTotalProportion } %
-            { currentTotalProportion == 100 ? '' : ' Please Adjust Proportion!'}
-          </span>{}
+        <div className='input-item text-area'>
+          <div className='label'>
+            Quiz Sections:
+          </div>
+          <div className='input-wrapper'>
+            <TextArea
+              className='text-area'
+              placeholder='section1, section2, section3...'
+              value={sectionStr}
+              onInput={(e: any) => setSectionStr(e.target.value)}
+            />
+          </div>
+          <Button onClick={() => updateQuizInfo('sections', null)}> Confirm </Button>
         </div>
-        <div className='domain-list'>
-          {domainList}
-        </div>
-        <Button onClick={addNewDomain}> Add Domain </Button>
       </div>
-
-      <div className='add-questions-container'>
-
+      <div className='section-list'>
+        { sectionList }
       </div>
 
       <div className='submit-container'>

@@ -16,8 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   Domain.init({
     name: DataTypes.STRING,
     proportion: DataTypes.INTEGER,
-    quiz_id: DataTypes.INTEGER,
     seq: DataTypes.INTEGER,
+    section_id: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Domain',

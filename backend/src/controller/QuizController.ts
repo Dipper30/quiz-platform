@@ -160,14 +160,15 @@ class Quiz extends BaseController {
       const { token } = req.headers
       const isValidToken = TokenService.verifyToken(token)
       const pid = Number(req.query.pid)
-      const data = { pid }
+      const pcid = Number(req.query.pcid)
+      const data = { pid, pcid }
       const questions = await QuizService.getQuestions(data, isValidToken)
 
       res.json({
         code: 200,
         msg: 'ok',
         data: {
-          partId: pid,
+          partId: pcid,
           questions,
         }
       })
@@ -178,7 +179,7 @@ class Quiz extends BaseController {
 
   async getQuestionsWithAuth (req: any, res: any, next: any): Promise<any> {
     try {
-      const data: { pid: Number } = req.query
+      const data: { pid:Number, pcid: Number } = req.query
       const questions = await QuizService.getQuestions(data)
 
       res.json({

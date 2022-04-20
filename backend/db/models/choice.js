@@ -13,12 +13,13 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
 
-    static async getTotalPointsByQuestionId(id) {
-      return await Choice.findAll({
+    static getTotalPointsByQuestionId = async function (id) {
+      const choices = await Choice.findAll({
         where: { question_id: id },
-        attributes: [[sequelize.fn('sum', sequelize.col('score')), 'totalPoints']],
       })
+      return choices.reduce((prev, cur) => prev + cur.score, 0)
     }
+
   }
   Choice.init({
     description: DataTypes.STRING,
@@ -30,5 +31,11 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Choice',
   });
+  // Choice.getTotalPointsByQuestionId = async function (id) {
+  //   const choices = await Choice.findAll({
+  //     where: { question_id: id },
+  //   })
+  //   return choices.reduce((prev, cur) => prev + cur.score, 0)
+  // }
   return Choice;
 };

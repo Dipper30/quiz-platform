@@ -1,6 +1,6 @@
 import { createRef, useEffect, useRef, useState } from 'react'
 import { useStore } from 'react-redux'
-import { Editing, Part, Question } from '../../vite-env'
+import { Editing, Part, PartChoice, Question } from '../../vite-env'
 import { RightOutlined, DownOutlined } from '@ant-design/icons'
 import api from '../..//http'
 import { deepClone, handleResult } from '../../utils'
@@ -49,6 +49,7 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
     const { data } = res
     const { partId, questions } = data
     setQuestions(questions)
+    resize()
   }
 
   const resize = () => {
@@ -62,37 +63,43 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
   }
 
   const updateQuestion = (question: Question) => {
-    questions.push(question)
-    setQuestions(deepClone(questions))
-    resize()
+    getQuestionsByPartId()
+    // questions.push(question)
+    // setQuestions(deepClone(questions))
   }
 
-  const questionList = questions.map((question: Question) => (
+  const partChoiceList = props.part.choices?.map((partchoice: PartChoice, index: number) => (
+    <div key={partchoice.id}> { `${choiceSeq[index + 1]}. ${partchoice.description} ${partchoice.show_sub ? '' : '(will not show sub questions)'}` } </div>
+  )) || []
+
+  const questionList = questions?.map((question: Question) => (
     <div className='question-container' key={question.id}>
-      { question.description }
+      { question.description } &nbsp;
+      {`(associated with ${ question.partChoices && question.partChoices.map((pc: PartChoice) => choiceSeq[props.part?.choices?.findIndex((choice: PartChoice) => choice.seq == pc.seq) + 1]).join(', ') })`}
       { question.choices.map(c => {
         return (
           <div key={c.id}> {choiceSeq[c.seq] }. { c.description } </div>
         )
       }) }
     </div>
-  ))
+  )) || []
 
   return (
     <div ref={partRef} className='admin-part-detail-container'>
 
       <div className='header' onClick={() => setCollapsed(!collapsed)}>
-        { props.part.domainName } / { props.part.name } ( { questions.length } ) Total Points: { props.part.totalPoints }
+      { props.part.sectionName } / { props.part.domainName } / { props.part.name } ( { questions.length } ) Total Points: { props.part.totalPoints }
         <div className='icon' >
           { collapsed ? <RightOutlined /> : <DownOutlined /> }
         </div>
       </div>
       <div className='question-list-container' ref={questionsRef} >
+        { partChoiceList }
         { questionList }
         <CreateQuestion
           resize={resize}
           update={updateQuestion}
-          partId={Number(props.part.id)}
+          part={props.part}
           createQuestion={function (): void {
           throw new Error('Function not implemented.')
         } } />
