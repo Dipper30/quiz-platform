@@ -8,6 +8,7 @@ import AdminNewQuiz from '../components/admin/NewQuiz'
 import AdminQuiz from '../components/admin/Quiz'
 import AdminQuizDetail from '../components/admin/QuizDetail'
 import NotFound from '../pages/404'
+import Quiz from '../pages/Quiz'
 
 const Router: React.FC = () => {
   return (
@@ -23,6 +24,7 @@ const Router: React.FC = () => {
           <Route path='new' element={<AdminNewQuiz />} />
           <Route path='*' element={<NotFound />} />
         </Route>
+        <Route path='/quiz/:id' element={<Quiz />} />
       </Routes>
     </BrowserRouter>
   )

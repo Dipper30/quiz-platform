@@ -227,3 +227,51 @@ IF NOT EXISTS Choices (
 	FOREIGN KEY ( question_id ) REFERENCES Questions ( id ) 
 )
 ```
+
+### Quiz Record
+
+Each submission will create a quiz history.
+
+```sql
+CREATE TABLE
+IF NOT EXISTS History (
+	id INT NOT NULL PRIMARY KEY,
+	quiz_id INT,
+  FOREIGN KEY ( quiz_id ) REFERENCES Quizzes ( id ) 
+)
+```
+
+### Quiz Choice Record
+
+This table records every choice the user selected of each question in each submission(each quiz)
+
+```sql
+CREATE TABLE
+IF NOT EXISTS Records (
+	id INT NOT NULL PRIMARY KEY,
+  history_id INT,
+	question_id INT,
+  choice_id VARCHAR, # eg: "2,3" it means use has selected choice id 2 and id 3
+  score INT, # this score is a snapshot, which can be not accurate if the quiz info is changed in the future
+  FOREIGN KEY ( history_id ) REFERENCES Histories ( id )
+  FOREIGN KEY ( question_id ) REFERENCES Questions ( id ) 
+  FOREIGN KEY ( choice_id ) REFERENCES Choices ( id ) 
+)
+```
+
+### Part Choice Record
+
+This table records every choice the user selected of each question in each submission(each quiz)
+
+```sql
+CREATE TABLE
+IF NOT EXISTS PartRecords (
+	id INT NOT NULL PRIMARY KEY,
+  history_id INT,
+	part_id INT,
+  partchoice_id INT,
+  FOREIGN KEY ( history_id ) REFERENCES Histories ( id )
+  FOREIGN KEY ( part_id ) REFERENCES Part ( id ) 
+  FOREIGN KEY ( partchoice_id ) REFERENCES PartChoice ( id ) 
+)
+```

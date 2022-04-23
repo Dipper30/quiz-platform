@@ -1,4 +1,8 @@
-import { pid } from "process"
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
+// import { Parser } from 'json2csv'
+import { ParameterException } from '../exception'
 import {
   TokenService,
   QuizService,
@@ -27,10 +31,51 @@ class Quiz extends BaseController {
     }
   }
 
+  async toggleVisibilityOfQuiz (req: any, res: any, next: any): Promise<any> {
+    try {
+      const data: { qid: number } = req.body
+
+      const quiz = await QuizService.toggleVisibilityOfQuiz({ id: data.qid })
+
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          quiz
+        },
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * show quizzes' abstracts excluding invisible ones
+   */
   async getQuizzes (req: any, res: any, next: any): Promise<any> {
     try {
       const { sort } = req.query
-      const quizzes = await QuizService.getQuizzes(sort)
+      const quizzes = await QuizService.getQuizzes(sort, false)
+      
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          quizzes
+        },
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * show quizzes' abstracts including invisible ones
+   */
+  async getAllQuizzes (req: any, res: any, next: any): Promise<any> {
+    try {
+      const { sort } = req.query
+      const quizzes = await QuizService.getQuizzes(sort, true)
       
       res.json({
         code: 200,
@@ -83,7 +128,7 @@ class Quiz extends BaseController {
 
   async deleteQuestion (req: any, res: any, next: any): Promise<any> {
     try {
-      const data: Question = req.body
+      const data: { id: number } = req.body
       const deleted = await QuizService.deleteQuestion(data)
       if (isError(deleted)) throw deleted
 
@@ -154,15 +199,12 @@ class Quiz extends BaseController {
   /**
    * get questions by part id 
    */
-  async getQuestions (req: any, res: any, next: any): Promise<any> {
+  async getQuestionsWithScore (req: any, res: any, next: any): Promise<any> {
     try {
-
-      const { token } = req.headers
-      const isValidToken = TokenService.verifyToken(token)
       const pid = Number(req.query.pid)
       const pcid = Number(req.query.pcid)
       const data = { pid, pcid }
-      const questions = await QuizService.getQuestions(data, isValidToken)
+      const questions = await QuizService.getQuestions(data, true)
 
       res.json({
         code: 200,
@@ -177,10 +219,15 @@ class Quiz extends BaseController {
     }
   }
 
-  async getQuestionsWithAuth (req: any, res: any, next: any): Promise<any> {
+  /**
+   * get questions with choices, except scores of each choice
+   */
+  async getQuestions (req: any, res: any, next: any): Promise<any> {
     try {
-      const data: { pid:Number, pcid: Number } = req.query
-      const questions = await QuizService.getQuestions(data)
+      const pid = Number(req.query.pid)
+      const pcid = Number(req.query.pcid)
+      const data = { pid, pcid }
+      const questions = await QuizService.getQuestions(data, false)
 
       res.json({
         code: 200,
@@ -192,6 +239,100 @@ class Quiz extends BaseController {
       })
     } catch (error) {
       next(error)
+    }
+  }
+
+  /**
+   * submit quiz
+   */
+  async submitQuiz (req: any, res: any, next: any): Promise<any> {
+    try {
+      const historyId = await QuizService.createHistory(req.body)
+      if (isError(historyId)) throw historyId
+      
+      const quiz = await QuizService.calculateScore(historyId)
+      if (isError(quiz)) throw quiz
+
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          quiz,
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getRecords (req: any, res: any, next: any): Promise<any> {
+    const strOutputFileName = 'records/output.csv'
+    const fWrite = fs.createWriteStream(strOutputFileName)  
+    try {
+      const { id } = req.params // quiz id
+      if (!id) throw new ParameterException()
+      const historyIdList = await QuizService.findAllHistoriesByQuizId(id)
+      if (isError(historyIdList)) throw historyIdList
+
+      let headers = ''
+      // write to file by line
+      for (const hid of historyIdList) {
+        const record = await QuizService.calculateScore(hid)
+        let line = ''
+        for (const section of record.sections) {
+          for (const domain of section.domains) {
+            for (const part of domain.parts) {
+              for (let index = 0; index < part.questions.length; index++) {
+                const score = part.questions[index].score || 0
+                if (!line) line += score
+                else line += (',' + score)
+              }
+            }
+          }
+        }
+        if (!headers) {
+          const len = line.split(',').length
+          for (let i = 0; i < len; i++) {
+            if (i === 0) headers += 'Q' + (i + 1)
+            else headers += ',Q' + (i + 1)
+          }  
+          fWrite.write(headers + os.EOL)
+        }
+        fWrite.write(line + os.EOL)
+      }
+
+      var options = {
+        root: path.join(__dirname)
+      }
+      res.sendFile('output.csv', { root: 'records' }, function (err: any, data: any) {
+        if (err) {
+          res.writeHead(404)
+          res.end(JSON.stringify(err))
+          return
+        }
+      })
+      // fs.readFile('records/output.csv', function (err: any, data: any) {
+      //   if (err) {
+      //     res.writeHead(404)
+      //     res.end(JSON.stringify(err))
+      //     return
+      //   }
+      //   res.header('Content-Type', 'text/csv')
+      //   res.writeHead(200)
+      //   res.end(data)
+      // })
+      // const csv = JSONToCSV(req.body, { fields: ["Customer Name", "Business Name", "Customer Email", "Customer ID", "School ID", "Student Count", "Admin Count", "Courses Count" ]})
+      // res.header('Content-Type', 'text/csv');
+      // res.attachment('output.csv')
+      // res.send(csv)
+      // res.json({
+      //   msg: 'ok'
+      // })
+    } catch (error) {
+      next(error)
+    } finally {
+      fWrite.close()
+
     }
   }
 

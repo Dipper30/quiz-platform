@@ -17,6 +17,7 @@ export const isString = (str: any): boolean => Object.prototype.toString.call(st
 
 export const isNumber = (num: any): boolean => Object.prototype.toString.call(num) == '[object Number]'
 
+export const isBoolean = (num: any): boolean => Object.prototype.toString.call(num) == '[object Boolean]'
 
 /**
  * check if the element is contained in Enum's value

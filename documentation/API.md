@@ -85,6 +85,27 @@
 }
 ```
 
+
+### Toggle Quiz Visibility
+
+```ts
+{
+  url: 'toggleVisibility',
+  method: 'post',
+  param: {
+    qid: Number
+  },
+  return_ok: {
+    code: 201,
+    msg: 'ok',
+  },
+  return_fail: {
+    code: ,
+    msg: '',
+  }
+}
+```
+
 ### Get Quizzes Abstract
 
 ```ts
@@ -137,6 +158,19 @@
 }
 ```
 
+### Get Quizzes Abstract Including Invisible Ones
+
+```ts
+{
+  url: 'allQuizzes',
+  method: 'get',
+  header: {
+    token: String, // require auth
+  },
+  // same as above
+}
+```
+
 ### Get Quiz
 
 ```ts
@@ -165,11 +199,9 @@
 
 ```ts
 {
-  url: 'questions?pid=[part_id]&pcid=[partchoice_id]',
+  // by default pcid will be 0 and you will get all questions
+  url: 'questions?pid=[part_id][&pcid=[partchoice_id]]',
   method: 'get',
-  header: {
-    token: String, // show choice scores with token, otherwise hide scores
-  },
   return_ok: {
     code: 201,
     msg: 'ok',
@@ -188,7 +220,7 @@
             description: String,
             seq: Number,
             show_sub: Boolean,
-            
+
           ],
           choices: [
             {
@@ -207,6 +239,22 @@
     code: ,
     msg: '',
   }
+}
+```
+
+### Get Questions With Score
+
+show scores of each choice, require token
+
+```ts
+{
+  // by default pcid will be 0 and you will get all questions
+  url: 'questionsWithScore?pid=[part_id][&pcid=[partchoice_id]]',
+  method: 'get',
+  header: {
+    token: String, // show choice scores with token, otherwise hide scores
+  },
+  // same as get questions above
 }
 ```
 
@@ -321,6 +369,48 @@
   return_ok: {
     code: 201,
     msg: 'ok',
+  },
+  return_fail: {
+    code: ,
+    msg: '',
+  }
+}
+```
+
+### Submit Quiz
+
+```ts
+{
+  url: 'submit',
+  method: 'post',
+  param: {
+    quizId: Number,
+    parts: [
+      {
+        pid: Number, // part id
+        pcid: Number, // part choice id
+        choices: [
+          {
+            qid: Number, // question id
+            cid: Number[], // arr of selected choice ids
+          },
+        ]
+      }
+    ]
+  },
+  return_ok: {
+    code: 201,
+    msg: 'ok',
+    data: {
+      totalScore: Number,
+      parts: [
+        {
+          part_id: Number,
+          name: String,
+          score: Number,
+        }
+      ]
+    }
   },
   return_fail: {
     code: ,

@@ -16,21 +16,25 @@ const router: Router = Router()
 router.post('/login', AuthValidator.checkLogin, AuthController.login)
 router.post('/token', TokenValidator.verifyToken, AuthController.loginByToken)
 
+// requests from users: hiding attributes such as 'score'
+router.get('/questions', QuizController.getQuestions)
+router.get('/quizzes', QuizController.getQuizzes)
+router.post('/submit', QuizValidator.checkSubmission, QuizController.submitQuiz)
+
+// requests from admin: show detailed attribute
+router.get('/allQuizzes', QuizController.getAllQuizzes)
+router.get('/quiz/:id', QuizValidator.checkGetQuiz, QuizController.getQuizById)
+router.get('/questionsWithScore', TokenValidator.verifyToken, QuizController.getQuestionsWithScore)
+router.get('/records/:id', QuizController.getRecords)
+
 // update quiz
 router.post('/initQuiz', QuizValidator.checkInitQuiz, TokenValidator.verifyToken, QuizController.initQuiz)
+router.post('/toggleVisibility', QuizValidator.checkVisibility, TokenValidator.verifyToken, QuizController.toggleVisibilityOfQuiz)
 router.post('/deleteQuiz', QuizValidator.checkDeleteQuiz, TokenValidator.verifyToken, QuizController.deleteQuiz)
 router.post('/question', TokenValidator.verifyToken, QuizController.createOrUpdateQuestion)
 router.post('/deleteQuestion', TokenValidator.verifyToken, QuizController.deleteQuestion)
 router.post('/choice', TokenValidator.verifyToken, QuizController.createOrUpdateChoice)
 router.post('/deleteChoice', TokenValidator.verifyToken, QuizController.deleteChoice)
 
-// requests from users: hiding attributes such as 'score'
-router.get('/questions', QuizController.getQuestions)
-
-// requests from admin: show detailed attribute
-router.get('/quizzes', QuizController.getQuizzes)
-router.get('/quiz/:id', QuizValidator.checkGetQuiz, QuizController.getQuizById)
-router.get('/questions', QuizController.getQuestions)
-router.get('/questionsDetail', QuizController.getQuestionsWithAuth)
 
 module.exports = router

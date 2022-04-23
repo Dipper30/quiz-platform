@@ -1,19 +1,23 @@
 import { Quiz as QuizType, Section } from '../../vite-env'
 import { Tag, Button } from 'antd'
 import api from '../../http'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { handleResult, warningMessage } from '../../utils'
 import { useState } from 'react'
+import { apiBaseURL } from '../../http/api'
 
 type QuizAbstractProps = {
   quiz: QuizType,
   clickable: boolean,
   withDomain: boolean,
-  deleted?: () => void,
+  withButton: boolean,
+  withTag: boolean,
+  update?: () => void,
+  onQuizDetail?: () => void,
 }
 
 const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
-
+  const location = useLocation()
   const navagate = useNavigate()
   const [lock, setLock] = useState<boolean>(false)
 
@@ -22,7 +26,7 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
   }
 
   const onDelete = async (e: any) => {
-    e.stopPropagation()
+    e && e.stopPropagation()
     if (lock) {
       warningMessage('Wait a Sec')
       return
@@ -31,7 +35,33 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
     const deleted = await api.deleteQuiz(props.quiz.id)
     setLock(false)
     if (!handleResult(deleted)) return
-    props.deleted && props.deleted()
+    props.update && props.update()
+  }
+
+  const toggleVisibility = async (e: any) => {
+    e && e.stopPropagation()
+    if (lock) {
+      warningMessage('Wait a Sec')
+      return
+    }
+    setLock(true)
+    const toggled = await api.toggleVisibility(props.quiz.id)
+    setLock(false)
+    if (!handleResult(toggled)) return
+    props.update && props.update()
+  }
+
+  const getRecord = async (e: any) => {
+    e && e.stopPropagation()
+    if (lock) {
+      warningMessage('Wait a Sec')
+      return
+    }
+    setLock(true)
+    const path = apiBaseURL + '/records/' + props.quiz.id
+    window.open(path, '_blank')
+    setLock(false)
+    // if (!handleResult(downloaded)) return
   }
 
   return (
@@ -40,13 +70,18 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
         ${props.clickable ?' clickable' : ''}
         ${props.withDomain ?' hover' : ''}
       `}
-      onClick={onQuizDetail}
+      onClick={props.onQuizDetail ? props.onQuizDetail : onQuizDetail}
     >
       <div className='header'>
-        <div> {props.quiz.title} </div>
-        { props.quiz.tag && <Tag color='geekblue'> { props.quiz.tag } </Tag> }
-        { !props.withDomain &&
-          <Button danger className='delete-btn' onClick={onDelete}> Delete </Button>
+        <div> {props.quiz.title} </div> &nbsp;
+        { props.withTag && ( props.quiz.visible ? <Tag color='green'> visible </Tag> : <Tag color='grey'> insivible </Tag> ) }
+        { props.withTag && props.quiz.tag && <Tag color='geekblue'> { props.quiz.tag } </Tag> }
+        { props.withButton &&
+          <div className='btn-group'>
+            <Button className='btn' onClick={getRecord}> Download CSV </Button>
+            <Button className='btn' onClick={toggleVisibility}> Toggle Visibility </Button>
+            <Button danger className='btn' onClick={onDelete}> Delete </Button>
+          </div>
         }
       </div>
        
@@ -54,10 +89,15 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
         <div className='col'>
           { `Total Points: ${props.quiz.total_points}` } 
         </div>
-        <div className='col'>
-          { `Created At: ${props.quiz.createdAt}` } 
-        </div>
+        {
+          props.withTag && (
+            <div className='col'>
+              { `Created At: ${props.quiz.createdAt}` } 
+            </div>
+          )
+        }
       </div>
+      
       <div className='row'>
         { `Descriptions: ${props.quiz.description}` } 
       </div>

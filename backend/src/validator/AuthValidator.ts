@@ -6,8 +6,8 @@ class AuthValidator extends BaseValidator {
   async checkLogin (req: any, res: any, next: any): Promise<any> {
     try {
       const { username, password } = req.body
-      const v = Validate(username).Between(4, 18)
-        && Validate(password).Between(6, 18)
+      const v = Validate(username).Between(4, 18).isValid
+        && Validate(password).Between(6, 18).isValid
       if (!v) throw createError()
       next()
     } catch (error) {

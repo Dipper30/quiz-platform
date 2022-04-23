@@ -31,7 +31,7 @@ export interface InitQuiz {
   title: String,
   tag?: String,
   description: String,
-  total_points: Number,
+  totalPoints: Number,
   sections: Section[],
 }
 
@@ -68,4 +68,20 @@ export interface GetQuiz {
   description: String,
   total_points: Number,
   sections: Section[],
+}
+
+export interface ChoiceSubmission {
+  qid: Number,
+  cid: Number[],
+}
+
+export interface PartSubmission {
+  pid: Number,
+  pcid: Number,
+  choices: ChoiceSubmission[],
+}
+
+export interface Submission {
+  quizId: Number,
+  parts: PartSubmission[],
 }

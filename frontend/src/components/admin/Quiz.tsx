@@ -14,7 +14,7 @@ const Quiz: React.FC<QuizProps> = (props) => {
   const [quizzes, setQuizzes] = useState<QuizType[]>([])
 
   const getQuizzesInfo = async () => {
-    const res = await api.getQuizzesInfo()
+    const res = await api.getAllQuizzesInfo()
     if (!handleResult(res, false)) return
     setQuizzes(res.data.quizzes)
   }
@@ -23,7 +23,17 @@ const Quiz: React.FC<QuizProps> = (props) => {
     getQuizzesInfo()
   }, [])
 
-  const quizList = quizzes.map(quiz => <QuizAbstract clickable={true} key={quiz.id} quiz={quiz} withDomain={false} deleted={getQuizzesInfo} />)
+  const quizList = quizzes.map(quiz => (
+    <QuizAbstract
+      clickable={true}
+      key={quiz.id}
+      quiz={quiz}
+      withDomain={false}
+      withButton={true}
+      withTag={true}
+      update={getQuizzesInfo}
+    />
+  ))
 
   return (
     <div className='admin-quiz-container'>

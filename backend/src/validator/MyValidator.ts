@@ -1,5 +1,6 @@
 
-import { isArray, isString, isEmptyValue, isNumber } from "../utils/tools"
+import { INTEGER } from "sequelize/types"
+import { isArray, isString, isEmptyValue, isNumber, isBoolean } from "../utils/tools"
 import { isBetween, isNumeric } from "../utils/validate"
 
 class MyValidator {
@@ -7,12 +8,11 @@ class MyValidator {
   #data: any
   #taskList: (() => boolean)[]
   #preventNext: Boolean = false
-  #isValid: boolean = true
 
   stringIsDigit: RegExp = /^\d+$/ // check if the string consists of numbers
+  #isValid: boolean = true
 
   constructor (data: any) {
-    console.log(data)
     this.#data = data
     this.#taskList = []
     if (isEmptyValue(data)) this.#preventNext = true
@@ -52,14 +52,21 @@ class MyValidator {
     return this
   }
 
-  Between (leftBound: number, rightBound: number, withLeft: boolean = true, withRight: boolean = true) {
+  Boolean () {
+    const fn = () => isBoolean(this.#data)
+    this.#taskList.push(fn)
+    return this
+  }
+
+  Between (leftBound: number, rightBound: number = Number.MAX_VALUE, withLeft: boolean = true, withRight: boolean = true) {
     const fn = () => isBetween(this.#data, leftBound, rightBound, withLeft, withRight)
     this.#taskList.push(fn)
     return this
   }
 
   // do all validation
-  check () {
+  get isValid () {
+    if (!this.#data) return false
     while (this.#isValid && !this.#preventNext && this.#taskList.length > 0) {
       const fn = <() => boolean>this.#taskList.shift()
       this.#isValid = fn()
@@ -67,12 +74,6 @@ class MyValidator {
     return this.#isValid
   }
 
-  /**
-   * Override show value
-   */ 
-  toString () {
-    return this.#isValid
-  }
 }
 
 export default MyValidator

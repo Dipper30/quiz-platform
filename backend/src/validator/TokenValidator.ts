@@ -32,7 +32,7 @@ class TokenValidator extends BaseValidator {
     try {
       const { id } = req.params
       const v = Validate(id).Numeric().Between(1, 2, false)
-      if (!v) throw createError('Wrong ID')
+      if (!v.isValid) throw createError('Wrong ID')
       next()
     } catch (error) {
       next(error)

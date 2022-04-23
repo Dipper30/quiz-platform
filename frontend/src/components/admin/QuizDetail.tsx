@@ -11,12 +11,12 @@ type QuizDetailProps = {
   
 }
 
-
 const initQuiz: Quiz = {
   title: '',
   tag: '',
   description: 'descriptions...',
   totalPoints: 100,
+  visible: true,
   sections: [],
 }
 
@@ -67,7 +67,13 @@ const QuizDetail: React.FC<QuizDetailProps> = (props) => {
 
   return (
     <div className='admin-quiz-detail-container'>
-      <QuizAbstract clickable={false} quiz={quiz} withDomain={true} />
+      <QuizAbstract
+        clickable={false}
+        quiz={quiz}
+        withDomain={true}
+        withTag={true}
+        withButton={false}
+      />
       { partDetailList }
     </div>
   )

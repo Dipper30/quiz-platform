@@ -1,0 +1,53 @@
+@import '../index.less';
+
+.quiz-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  min-width: 800px;
+  min-height: 600px;
+  color: #333;
+  .start-btn {
+    margin: auto;
+  }
+  .part-container {
+    width: 50%;
+    margin: 0 auto;
+    .part-description {
+      text-align: center;
+      margin: auto;
+      margin-top: 100px;
+      span {
+        color: @theme;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    }
+    .part-choices {
+      .part-choice {
+        display: flex;
+        flex-direction: row;
+        transition: 0.4s ease;
+        padding: 10px 20px;
+        border-radius: 10px;
+        cursor: pointer;
+        margin: 5px 0;
+        position: relative;
+        &:hover {
+          background-color: @light-hover;
+        }
+        &.selected {
+          background-color: @green;
+          color: #333;
+        }
+      }
+    }
+    .seq {
+      width: 30px;
+    }
+    .check-box {
+      position: absolute;
+      left: -20px;
+    }
+  }
+}

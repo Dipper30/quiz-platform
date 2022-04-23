@@ -1,4 +1,4 @@
-import { REACT_APP_ENVIRONMENT } from "../vite-env";
+import { REACT_APP_ENVIRONMENT } from '../vite-env'
 
 export const BASE_URL: any = {
   'development': 'localhost',

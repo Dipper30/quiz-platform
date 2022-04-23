@@ -24,6 +24,7 @@ interface Quiz {
   description: string,
   totalPoints: number,
   sections: Section[],
+  visible?: boolean,
   [key: string]: any,
 }
 
@@ -84,6 +85,7 @@ interface Question {
   imgSrc?: string | null,
   choices: Choice[],
   partChoices?: any[],
+  is_multi?: boolean,
 }
 
 interface Choice {

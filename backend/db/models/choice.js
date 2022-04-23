@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Choice.belongsTo(models.Question, { foreignKey: 'question_id', targetKey: 'id' })
     }
 
     static getTotalPointsByQuestionId = async function (id) {

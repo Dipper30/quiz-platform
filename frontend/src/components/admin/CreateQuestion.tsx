@@ -157,8 +157,6 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
   }
 
   const onSubmit = async () => {
-    console.log(associates)
-
     question.partId = props.part.id
     question.partChoices = associates
     if (lock || !validate()) return
@@ -168,11 +166,16 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     if (!handleResult(res)) return
     dropQuestion()
     props.update(res.data.question)
+    setAssociates([])
   }
 
   const validate = () => {
     if (!question.description || question.choices.length == 0) {
       errorMessage('Please complete required fields.')
+      return false
+    }
+    if (associates.length == 0) {
+      errorMessage('Please associate with at least one part choice.')
       return false
     }
     let sum = 0
@@ -183,7 +186,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
       errorMessage('Please set at least one choice as correct.')
       return false
     }
-    if ((sum > 1 && !question.isMulti) || (sum == 1 && question.isMulti)) {
+    if (sum > 1 && !question.isMulti) {
       errorMessage('Please check if there are more than one correct answer.')
       return false
     }
@@ -209,7 +212,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
         (
           <div>
             <div className='row'>
-              More than one correct choice ? &nbsp;
+              Can select more than one choice? &nbsp;
               <Checkbox checked={question.isMulti} onChange={(e: any) => updateQuestionInfo('isMulti', e.target.checked)} />
             </div>
             <div className='row'>
@@ -217,7 +220,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
               {
                 availablePartChoices &&
                 availablePartChoices.map((c: any) => (
-                  <span key={c.id}> { c.alpha } <Checkbox onChange={(e: any) => updateAssociatedPartChoice(c.id, e.target.checked)} />  &nbsp; &nbsp; &nbsp; </span>
+                  <span key={c.id}> { c.alpha } <Checkbox defaultChecked={false} onChange={(e: any) => updateAssociatedPartChoice(c.id, e.target.checked)} />  &nbsp; &nbsp; &nbsp; </span>
                 ))
               }
             </div>
