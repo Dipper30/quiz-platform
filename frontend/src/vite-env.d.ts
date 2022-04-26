@@ -86,6 +86,7 @@ interface Question {
   choices: Choice[],
   partChoices?: any[],
   is_multi?: boolean,
+  name?: string,
 }
 
 interface Choice {

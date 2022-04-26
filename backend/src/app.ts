@@ -11,7 +11,7 @@ app.use(express.static('dist'))
 app.all('*', async (req: any, res: any, next: any) => {
   const { origin, Origin, referer, Referer } = req.headers
   const allowOrigin = origin || Origin || referer || Referer || '*'
-  // console.log('get', allowOrigin)
+
   res.header('Access-Control-Allow-Origin', allowOrigin)
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, token') // with token
   res.header('Access-Control-Allow-Methods', 'PUT,POST,GET,DELETE,OPTIONS')

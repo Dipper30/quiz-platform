@@ -1,0 +1,38 @@
+@import '../index.less';
+
+.question-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 600px;
+  .description {
+    border-radius: 10px;
+    border: 1px dashed #333;
+    padding: 10px;
+    width: 100%;
+  }
+  .choice-list {
+    width: 100%;
+    .choice {
+      
+      display: flex;
+      flex-direction: row;
+      transition: 0.4s ease;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 5px 0;
+      position: relative;
+      &:hover {
+        background-color: @light-hover;
+      }
+      &.selected {
+        background-color: @green;
+        color: #333;
+      }
+    }
+  }
+  .seq {
+    width: 30px;
+  }
+}
