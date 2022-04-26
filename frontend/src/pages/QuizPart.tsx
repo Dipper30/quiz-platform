@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { choiceSeq } from '../config/choices'
 import { Checkbox, Button } from 'antd'
 import { SubmissionChoice, SubmissionPart } from './Quiz'
@@ -19,14 +19,35 @@ type QuizPartProps = {
 const QuizPart: React.FC<QuizPartProps> = (props) => {
 
   const [questions, setQuestions] = useState<IQuestion[]>([])
-  const [selected, setSelected] = useState<boolean>(false)
+  const [selected, setSelected] = useState<boolean>(false) // current part selected
   const [submissionPart, setSubmissionPart] = useState<SubmissionPart>(
     {
-      pid: props.currentPartId,
+      pid: props.part.id,
       pcid: 0,
       choices: [],
     },
   )
+
+  // useEffect(() => {
+
+  // }, [props.currentPartId])
+
+  const getQuestions = async () => {
+    const res = await api.getQuestionsByPartId(
+      props.part.id,
+      submissionPart.pcid,
+      false,
+    )
+    if (!handleResult(res, false)) return
+    setSelected(true)
+    if (!res.data.questions.length) {
+      submitQuestions()
+      return
+    }
+    
+    // render questions
+    setQuestions(res.data.questions)
+  }
 
   const confirmPartChoice = async () => {
     // get questions according what user selected
@@ -34,19 +55,7 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
       errorMessage('Please select your choice.')
       return
     }
-    const res = await api.getQuestionsByPartId(
-      props.currentPartId,
-      submissionPart.pcid,
-      false,
-    )
-    if (!handleResult(res, false)) return
-    setSelected(true)
-    if (!res.data.questions.length) {
-      props.goNext()
-      return
-    }
-    // render questions
-    setQuestions(res.data.questions)
+    getQuestions()
   }
 
   const updatePartChoice = (choice: SubmissionChoice) => {
@@ -71,10 +80,24 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
     setSubmissionPart(deepClone(submissionPart))
   }
 
+  // submit questions of current part
+  const submitQuestions = () => {
+    console.log('submit ', submissionPart)
+    // make sure all questions are answered
+    for (const choice of submissionPart.choices) {
+      if (!choice.cid.length) {
+        errorMessage('Please complete all questions')
+        return
+      }
+    }
+    props.update(submissionPart)
+    props.goNext()
+  }
+
   return (
     <>
-      {
-        props.visible && !selected ?
+      { props.visible && (
+        !selected ?
           <div>
             <div className='part-container'>
               <Question
@@ -86,18 +109,19 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
             <Button onClick={confirmPartChoice}> Confirm </Button>
           </div>
         : (
-            <div className='question-list'>
-              {questions.map((q: IQuestion, index: number) => (
-                <Question
-                  key={q.id}
-                  question={q}
-                  seq={index + 1}
-                  update={updateQuestion}
-                />
-              ))}
-            </div>
+          <div className='question-list'>
+            { questions && questions.map((q: IQuestion, index: number) => (
+              <Question
+                key={q.id}
+                question={q}
+                seq={index + 1}
+                update={updateQuestion}
+              />
+            )) }
+            <Button onClick={submitQuestions}> Submit </Button>
+          </div>
         )
-      }
+      )}
     </>
 
   )

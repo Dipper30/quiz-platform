@@ -452,13 +452,16 @@ class Quiz extends BaseService {
       let questionModels
       if (pcid) {
         // search questions asscociated with specific part choice
-        questionModels = await RelateQuestionModel.findAll({
+        const realtionModels = await RelateQuestionModel.findAll({
           where: { partchoice_id: pcid },
-          include: [{
-            model: QuestionModel,
-              // as:"items",//返回的对象修改成一个固定的名称
-          }]
+          attributes: ['question_id'],
         })
+        const qids = realtionModels.map((r: any) => r.question_id)
+        console.log(qids)
+        questionModels = await QuestionModel.findAll({
+          where: { part_id: pid, destroyed: false, id: { [Op.in]: qids } },
+          attributes: { exclude: this.excludeAttributes },
+        }) 
       } else {
         // search all questions in a part
         questionModels = await QuestionModel.findAll({
@@ -473,19 +476,19 @@ class Quiz extends BaseService {
       for (let index = 0; index < questions.length; index++) {
         const question = questions[index]
 
-        // show what part choice the question is associated with
-        const relations: any = await RelateQuestionModel.findAll({
-          where: { question_id: question.id },
-        })
-        let partchoices: number[] = []
-        relations && relations.map((r: any) => {
-          partchoices.push(r.dataValues.partchoice_id)
-        })
-        const partChoiceModels = await PartChoiceModel.findAll({
-          where: { id: { [Op.in]: partchoices } },
-          attributes: { exclude: this.excludeAttributes },
-        })
-        question.partChoices = partChoiceModels ? partChoiceModels.map((v: any) => v.dataValues) : []
+        // // show what part choice the question is associated with
+        // const relations: any = await RelateQuestionModel.findAll({
+        //   where: { question_id: question.id },
+        // })
+        // let partchoices: number[] = []
+        // relations && relations.map((r: any) => {
+        //   partchoices.push(r.dataValues.partchoice_id)
+        // })
+        // const partChoiceModels = await PartChoiceModel.findAll({
+        //   where: { id: { [Op.in]: partchoices } },
+        //   attributes: { exclude: this.excludeAttributes },
+        // })
+        // question.partChoices = partChoiceModels ? partChoiceModels.map((v: any) => v.dataValues) : []
 
         const excludeAttributes = withScore ? this.excludeAttributes : ['score', ...this.excludeAttributes]
         const choiceModels = await ChoiceModel.findAll({

@@ -3,7 +3,7 @@ import { Button } from 'antd'
 import api from '../http'
 import { useParams } from 'react-router-dom'
 import { withRouter } from '../utils/pureFunctions'
-import { handleResult } from '../utils'
+import { deepClone, handleResult } from '../utils'
 import './Quiz.less'
 import QuizPart from './QuizPart'
 
@@ -90,8 +90,10 @@ const Quiz: React.FC<QuizProps> = (props) => {
   const updatePart = (newPart: SubmissionPart) => {
     const { pid } = newPart
     let hasRecord = false
+    console.log('current ', submission)
+    console.log('get ', newPart)
     for (let part of submission.parts) {
-      if (part.pid == newPart.pid) {
+      if (part.pid === newPart.pid) {
         hasRecord = true
         part = newPart
         break
@@ -100,17 +102,17 @@ const Quiz: React.FC<QuizProps> = (props) => {
     if (!hasRecord) {
       submission.parts.push(newPart)
     }
-    console.log(submission)
+    setSubmission(deepClone(submission))
+    setTimeout(() => console.log(submission), 10)
+    
   }
 
   const goNextPart = () => {
     if (parts.length > currentPartIndex + 1) {
       setPartId(parts[currentPartIndex + 1].id)
-      setCurrentPartIndex(currentPartIndex + 1)
     } else {
       console.log('reach end of quiz!')
     }
-   
   }
 
   return (

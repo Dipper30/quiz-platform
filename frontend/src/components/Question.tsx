@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { choiceSeq } from '../config/choices'
 import { SubmissionChoice } from '../pages/Quiz'
 import { deepClone } from '../utils'
@@ -15,6 +15,10 @@ const Question: React.FC<QuestionProps> = (props) => {
 
   const [selectedPartChoices, setSelectedPartChoices] = useState<number[]>([])
 
+  useEffect(() => {
+    props.update({ qid: Number(props.question.id), cid: selectedPartChoices })
+  }, [selectedPartChoices])
+
   const toggleSelected = (id: number) => {
     let hasRecord = false
     for (let i = 0; i < selectedPartChoices.length; i++) {
@@ -24,11 +28,13 @@ const Question: React.FC<QuestionProps> = (props) => {
         break
       }
     }
-    if (!hasRecord) {
-      selectedPartChoices.push(id)
+
+    if (props.question.isMulti) {
+      if (!hasRecord) selectedPartChoices.push(id)
+      setSelectedPartChoices(deepClone(selectedPartChoices))
+    } else {
+      hasRecord ? setSelectedPartChoices([]) : setSelectedPartChoices([id])
     }
-    setSelectedPartChoices(deepClone(selectedPartChoices))
-    props.update({ qid: Number(props.question.id), cid: selectedPartChoices })
   }
 
   return (
@@ -37,6 +43,9 @@ const Question: React.FC<QuestionProps> = (props) => {
         { props.seq }. &nbsp;
         { props.question.description ||
           `In this part, we will focus on ${props.question.name}.`
+        }
+        { props.question.isMulti &&
+          <span> Multiple choices </span>
         }
       </div>
       <div className='choice-list'>
