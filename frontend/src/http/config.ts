@@ -61,3 +61,7 @@ export const createQuestion = (question: Question) => {
 export const getRecords = (qid: number) => {
   return get(`records/${qid}`)
 }
+
+export const submitQuiz = (data: any) => {
+  return post('submit', data)
+}

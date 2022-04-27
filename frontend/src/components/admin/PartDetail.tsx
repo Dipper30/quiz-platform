@@ -79,7 +79,7 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
   )) || []
 
   const questionList = questions?.map((question: Question, index: number) => (
-    <div className='question-container' key={question.id}>
+    <div className='admin-question-container' key={question.id}>
       <span> {index + 1}. </span>
       <Button className='delete-btn' danger onClick={() => deleteQuestion(question.id || 0)}> Delete </Button>
       { question.description } &nbsp;

@@ -82,7 +82,6 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
 
   // submit questions of current part
   const submitQuestions = () => {
-    console.log('submit ', submissionPart)
     // make sure all questions are answered
     for (const choice of submissionPart.choices) {
       if (!choice.cid.length) {

@@ -257,6 +257,7 @@ class Quiz extends BaseController {
         code: 200,
         msg: 'ok',
         data: {
+          historyId,
           quiz,
         }
       })
@@ -265,6 +266,28 @@ class Quiz extends BaseController {
     }
   }
 
+  async getHistory (req: any, res: any, next: any): Promise<any> {
+    try {
+      const historyId = Number(req.params.id)
+      const quiz = await QuizService.calculateScore(historyId)
+      if (isError(quiz)) throw quiz
+
+      res.json({
+        code: 200,
+        msg: 'ok',
+        data: {
+          historyId,
+          quiz,
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * get csv file
+   */
   async getRecords (req: any, res: any, next: any): Promise<any> {
     const strOutputFileName = 'records/output.csv'
     const fWrite = fs.createWriteStream(strOutputFileName)  

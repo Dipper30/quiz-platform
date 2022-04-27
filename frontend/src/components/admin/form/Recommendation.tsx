@@ -28,8 +28,8 @@ const Recommendation: React.FC<RecommendationProps> = (props) => {
 
   return (
     <div className='admin-partchoice-container'>
-      <Input placeholder='paste links here' defaultValue={props.recommendation.link} onInput={(e: any) => updateRecommendationInfo('domainName', e.target.value)} />
-      <InputNumber placeholder='Show link if under...' defaultValue={props.recommendation.show_under || 25} onChange={(e: number) => updateRecommendationInfo('domainName', e)} />
+      <Input placeholder='paste links here' defaultValue={props.recommendation.link} onInput={(e: any) => updateRecommendationInfo('link', e.target.value)} />
+      <InputNumber placeholder='Show link if under...' defaultValue={props.recommendation.show_under || 25} onChange={(e: number) => updateRecommendationInfo('showUnder', e)} />
       <MinusCircleOutlined className='delete-btn icon-btn' onClick={() => props.deleteRecommendation(props.id)} />
     </div>
   )

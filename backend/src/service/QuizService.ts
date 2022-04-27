@@ -457,7 +457,7 @@ class Quiz extends BaseService {
           attributes: ['question_id'],
         })
         const qids = realtionModels.map((r: any) => r.question_id)
-        console.log(qids)
+
         questionModels = await QuestionModel.findAll({
           where: { part_id: pid, destroyed: false, id: { [Op.in]: qids } },
           attributes: { exclude: this.excludeAttributes },
@@ -476,19 +476,19 @@ class Quiz extends BaseService {
       for (let index = 0; index < questions.length; index++) {
         const question = questions[index]
 
-        // // show what part choice the question is associated with
-        // const relations: any = await RelateQuestionModel.findAll({
-        //   where: { question_id: question.id },
-        // })
-        // let partchoices: number[] = []
-        // relations && relations.map((r: any) => {
-        //   partchoices.push(r.dataValues.partchoice_id)
-        // })
-        // const partChoiceModels = await PartChoiceModel.findAll({
-        //   where: { id: { [Op.in]: partchoices } },
-        //   attributes: { exclude: this.excludeAttributes },
-        // })
-        // question.partChoices = partChoiceModels ? partChoiceModels.map((v: any) => v.dataValues) : []
+        // show what part choice the question is associated with
+        const relations: any = await RelateQuestionModel.findAll({
+          where: { question_id: question.id },
+        })
+        let partchoices: number[] = []
+        relations && relations.map((r: any) => {
+          partchoices.push(r.dataValues.partchoice_id)
+        })
+        const partChoiceModels = await PartChoiceModel.findAll({
+          where: { id: { [Op.in]: partchoices } },
+          attributes: { exclude: this.excludeAttributes },
+        })
+        question.partChoices = partChoiceModels ? partChoiceModels.map((v: any) => v.dataValues) : []
 
         const excludeAttributes = withScore ? this.excludeAttributes : ['score', ...this.excludeAttributes]
         const choiceModels = await ChoiceModel.findAll({
@@ -719,7 +719,7 @@ class Quiz extends BaseService {
         }
 
         // calculate section score
-        section.score = section.domains.reduce((prev: number, cur: any) => prev + (cur.score / cur.totalPoints * cur.proportion), 0)
+        section.score = section.domains.reduce((prev: number, cur: any) => prev + (cur.score ? cur.score / cur.totalPoints * cur.proportion : 0), 0)
       }
 
       quiz.score = quiz.sections.reduce((prev: number, cur: any) => prev + (cur.score || 0), 0) / quiz.sections.length

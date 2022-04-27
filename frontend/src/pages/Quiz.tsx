@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from 'antd'
 import api from '../http'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { withRouter } from '../utils/pureFunctions'
 import { deepClone, handleResult } from '../utils'
 import './Quiz.less'
@@ -40,6 +40,7 @@ const Quiz: React.FC<QuizProps> = (props) => {
     parts: [],
   })
   const params = useParams()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const quizId = Number(params.id)
@@ -84,7 +85,6 @@ const Quiz: React.FC<QuizProps> = (props) => {
     console.log(res.data.quiz)
     setState('undergoing')
     const parts = getParts(res.data.quiz)
-    console.log('parts ', parts)
   }
 
   const updatePart = (newPart: SubmissionPart) => {
@@ -107,10 +107,20 @@ const Quiz: React.FC<QuizProps> = (props) => {
     
   }
 
+  const submitQuiz = async () => {
+    console.log('submit ! ', submission)
+    const res = await api.submitQuiz(submission)
+    if (!handleResult(res)) return
+    const { data } = res
+    navigate('/result', { state: { quiz: data.quiz } })
+  }
+
   const goNextPart = () => {
     if (parts.length > currentPartIndex + 1) {
       setPartId(parts[currentPartIndex + 1].id)
+      setCurrentPartIndex(currentPartIndex + 1)
     } else {
+      submitQuiz()
       console.log('reach end of quiz!')
     }
   }

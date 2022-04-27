@@ -29,7 +29,7 @@ const Question: React.FC<QuestionProps> = (props) => {
       }
     }
 
-    if (props.question.isMulti) {
+    if (props.question.is_multi) {
       if (!hasRecord) selectedPartChoices.push(id)
       setSelectedPartChoices(deepClone(selectedPartChoices))
     } else {

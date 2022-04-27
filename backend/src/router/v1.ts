@@ -25,7 +25,8 @@ router.post('/submit', QuizValidator.checkSubmission, QuizController.submitQuiz)
 router.get('/allQuizzes', QuizController.getAllQuizzes)
 router.get('/quiz/:id', QuizValidator.checkGetQuiz, QuizController.getQuizById)
 router.get('/questionsWithScore', TokenValidator.verifyToken, QuizController.getQuestionsWithScore)
-router.get('/records/:id', QuizController.getRecords)
+router.get('/records/:id', QuizController.getRecords) // get csv file
+router.get('/history/:id', TokenValidator.verifyToken, QuizController.getHistory) // get history by id
 
 // update quiz
 router.post('/initQuiz', QuizValidator.checkInitQuiz, TokenValidator.verifyToken, QuizController.initQuiz)
