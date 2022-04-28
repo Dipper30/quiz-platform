@@ -1,5 +1,4 @@
 import { PayloadAction } from '@reduxjs/toolkit'
-import { User } from '../../config/types'
 
 const initialState = {
   username: '',
@@ -7,7 +6,7 @@ const initialState = {
   chatroomId: null,
 }
 
-const userReducer = (preState: User = initialState, action: any) => {
+const userReducer = (preState: any = initialState, action: any) => {
   const { type, data } = action
   switch (type) {
   case 'setUser':

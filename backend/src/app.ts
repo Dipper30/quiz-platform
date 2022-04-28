@@ -1,12 +1,13 @@
 const express = require('express')
 const router = require('./router/index.ts')
+import fs from 'fs'
 require('dotenv').config()
 
 const app = express()
 
 app.use(express.json({ limit: '20mb' }))
 app.use(express.urlencoded({ extended: true }))
-app.use(express.static('dist'))
+app.use(express.static('build'))
 
 app.all('*', async (req: any, res: any, next: any) => {
   const { origin, Origin, referer, Referer } = req.headers
@@ -22,6 +23,27 @@ app.all('*', async (req: any, res: any, next: any) => {
     res.sendStatus(200)
   } else {
     next()
+  }
+})
+
+app.get('*', async (req: any, res: any, next: any) => {
+  console.log(req.url)
+  if (req.url.substr(0, 4) == '/api') {
+    next()
+  } else {
+    // res.writeHead(200, {
+    //   'Content-Type': 'text/html',
+    // })
+    // res.end('build/index.html')
+    fs.readFile('build/index.html', (err: any, data: any) => {
+      if (err) {
+        res.writeHead(404)
+        res.end(JSON.stringify(err))
+        return
+      }
+      res.writeHead(200)
+      res.end(data)
+    })
   }
 })
 

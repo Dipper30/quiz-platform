@@ -2,7 +2,7 @@ import { REACT_APP_ENVIRONMENT } from '../vite-env'
 
 export const BASE_URL: any = {
   'development': 'localhost',
-  'production': 'www.your_domain.com',
+  'production': '3.16.38.107',
 }
 
 export const PORT: any = {
