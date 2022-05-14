@@ -1,4 +1,3 @@
-import { Part, SeqType, PartChoice as PartChoiceType, Recommendation as RecommendationType } from '../../../vite-env'
 import Sequence from './Sequence'
 import { Input, Button } from 'antd'
 import { useState } from 'react'
@@ -7,10 +6,10 @@ import { PlusCircleOutlined } from '@ant-design/icons'
 import Recommendation from './Recommendation'
 
 type PartItemProps = {
-  part: Part,
+  part: PartType,
   seqType: SeqType,
   deletePart: (seq: number) => void,
-  update: (part: Part, seq: number) => void,
+  update: (part: PartType, seq: number) => void,
 }
 
 const PartItem: React.FC<PartItemProps> = (props) => {

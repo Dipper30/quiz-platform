@@ -60,6 +60,6 @@ app.use((err: any, req: any, res: any, next: any) => {
   }
 })
 
-app.listen(3000, () => {
-  console.log('ok ', process.env.USERNAME)
+app.listen(3030, () => {
+  console.log('Quiz Platform Started!', process.env.USERNAME)
 })

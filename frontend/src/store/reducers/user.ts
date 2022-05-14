@@ -1,5 +1,3 @@
-import { PayloadAction } from '@reduxjs/toolkit'
-
 const initialState = {
   username: '',
   id: 0,

@@ -17,6 +17,7 @@ export interface Part {
   choices: Choice[],
   recommendations: Recommendation[],
   totalPoints?: number,
+  description: string,
 }
 
 export interface Domain {

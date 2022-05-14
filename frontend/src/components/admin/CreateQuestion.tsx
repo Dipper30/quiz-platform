@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Choice, Part, PartChoice, Question } from '../../vite-env'
 import { Input, InputNumber, Button, Checkbox } from 'antd'
 import { deepClone, errorMessage, handleResult } from '../../utils'
 import { CloseCircleOutlined } from '@ant-design/icons'
@@ -11,9 +10,9 @@ const { TextArea } = Input
 
 type CreateChoiceProps = {
   questionId: number,
-  choice: Choice,
+  choice: ChoiceType,
   createChoice?: () => void,
-  update: (choice: Choice, seq: number) => void,
+  update: (choice: ChoiceType, seq: number) => void,
   delete?: (seq: number) => void
 }
 
@@ -26,7 +25,7 @@ const initChoice = {
 
 export const CreateChoice: React.FC<CreateChoiceProps> = (props) => {
 
-  const [choice, setChoice] = useState<Choice>(deepClone(props.choice))
+  const [choice, setChoice] = useState<ChoiceType>(deepClone(props.choice))
 
   useEffect(() => {
     if (props.choice) setChoice(props.choice)
@@ -73,13 +72,13 @@ export const CreateChoice: React.FC<CreateChoiceProps> = (props) => {
 }
 
 type CreateQuestionProps = {
-  part: Part,
+  part: PartType,
   createQuestion: () => void,
   resize?: () => void,
-  update: (question: Question) => void,
+  update: (question: QuestionType) => void,
 }
 
-const initChoices: Choice[] = [
+const initChoices: ChoiceType[] = [
   {
     description: 'Wrong Choice',
     seq: 1,
@@ -92,7 +91,7 @@ const initChoices: Choice[] = [
   },
 ]
 
-const initQuestion: Question = {
+const initQuestion: QuestionType = {
   description: 'Question Descriptions Here...',
   seq: 0,
   partId: 0,
@@ -102,12 +101,12 @@ const initQuestion: Question = {
 
 export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
 
-  const [question, setQuestion] = useState<Question>(initQuestion)
+  const [question, setQuestion] = useState<QuestionType>(initQuestion)
   const [associates, setAssociates] = useState<number[]>([])
   const [init, setInit] = useState<boolean>(false)
   const [lock, setLock] = useState<boolean>(false)
 
-  const availablePartChoices = useMemo(() => props.part.choices.map((c: PartChoice, index: number) => ({ alpha: choiceSeq[index + 1], id: c.id, show_sub: c.show_sub })).filter((c: any) => c.show_sub), [props.part])
+  const availablePartChoices = useMemo(() => props.part.choices.map((c: PartChoiceType, index: number) => ({ alpha: choiceSeq[index + 1], id: c.id, show_sub: c.show_sub })).filter((c: any) => c.show_sub), [props.part])
 
   const updateQuestionInfo = (key: string, value: any) => {
     switch (key) {

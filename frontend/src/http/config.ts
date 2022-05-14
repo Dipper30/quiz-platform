@@ -1,4 +1,3 @@
-import { Question, Quiz } from '../vite-env'
 import { http, get, post, uploadFiles } from './api'
 
 export const login = (params: {username: string, password: string}) => {
@@ -9,7 +8,7 @@ export const loginByToken = () => {
   return post('/token')
 }
 
-export const initQuiz = (quiz: Quiz) => {
+export const initQuiz = (quiz: QuizType) => {
   return post('initQuiz', quiz)
 }
 
@@ -48,7 +47,7 @@ export const deleteQuestionById = (pid: number) => {
   return post('deleteQuestion', { id: pid })
 }
 
-export const createQuestion = (question: Question) => {
+export const createQuestion = (question: QuestionType) => {
   return post('question', {
     isMulti: question.isMulti,
     description: question.description,

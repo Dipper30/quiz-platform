@@ -81,6 +81,7 @@ class Quiz extends BaseService {
               name: part.partName,
               seq: part.seq,
               destroyed: false,
+              description: part.description,
               domain_id: domainId,
             }, { transaction: t })
 
@@ -162,7 +163,6 @@ class Quiz extends BaseService {
       })
       if (!quizzes) return []
       return quizzes
-      // return omitFields(quizzes, ['destroyed'], false)
     } catch (error) {
       return error
     }

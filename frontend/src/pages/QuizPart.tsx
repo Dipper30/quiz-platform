@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import { choiceSeq } from '../config/choices'
 import { Checkbox, Button } from 'antd'
 import { SubmissionChoice, SubmissionPart } from './Quiz'
-import Question from '../components/Question'
-import { Choice, Question as IQuestion } from '../vite-env'
+import Question from '@/components/Question'
+import SectionTitle from '@/components/SectionTitle'
+import PartTitle from '@/components/PartTitle'
 
 import { deepClone, errorMessage, handleResult } from '../utils'
 import api from '../http'
+import './QuizPart.less'
 
 type QuizPartProps = {
   part: any,
@@ -18,7 +20,7 @@ type QuizPartProps = {
 
 const QuizPart: React.FC<QuizPartProps> = (props) => {
 
-  const [questions, setQuestions] = useState<IQuestion[]>([])
+  const [questions, setQuestions] = useState<QuestionType[]>([])
   const [selected, setSelected] = useState<boolean>(false) // current part selected
   const [submissionPart, setSubmissionPart] = useState<SubmissionPart>(
     {
@@ -96,30 +98,42 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
   return (
     <>
       { props.visible && (
-        !selected ?
-          <div>
-            <div className='part-container'>
-              <Question
-                question={props.part}
-                seq={1}
-                update={updatePartChoice}
-              />
+        <>
+        <SectionTitle>
+          { `Section${props.part.sectionIndex}: ${props.part.sectionName}` }
+        </SectionTitle>
+        <div className='content-container'>
+          <PartTitle> { `${!selected ? 'Self-Assesment: ' : ''}${props.part.name}` } </PartTitle>
+        {
+          !selected ? (
+            <div>
+              <div className='part-container'>
+                <Question
+                  isSubQuestion={false}
+                  question={props.part}
+                  seq={1}
+                  update={updatePartChoice}
+                />
+              </div>
+              <Button onClick={confirmPartChoice}> Confirm </Button>
             </div>
-            <Button onClick={confirmPartChoice}> Confirm </Button>
-          </div>
-        : (
-          <div className='question-list'>
-            { questions && questions.map((q: IQuestion, index: number) => (
-              <Question
-                key={q.id}
-                question={q}
-                seq={index + 1}
-                update={updateQuestion}
-              />
-            )) }
-            <Button onClick={submitQuestions}> Submit </Button>
-          </div>
-        )
+          ) : (
+            <div className='question-list'>
+              { questions && questions.map((q: QuestionType, index: number) => (
+                <Question
+                  key={q.id}
+                  isSubQuestion={true}
+                  question={q}
+                  seq={index + 1}
+                  update={updateQuestion}
+                />
+              )) }
+              <Button onClick={submitQuestions}> Submit </Button>
+            </div>
+          )
+        }
+        </div>
+        </>
       )}
     </>
 

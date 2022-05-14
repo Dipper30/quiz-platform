@@ -1,19 +1,18 @@
 import { Button } from 'antd'
 import { useMemo, useState } from 'react'
-import { Domain, Section } from '../../../vite-env'
 import DomainItem from './DomainItem'
 
 type SectionItemProps = {
-  section: Section,
+  section: SectionType,
   seq: number,
-  update: (section: Section, seq: number) => void,
+  update: (section: SectionType, seq: number) => void,
 }
 
 const SectionItem: React.FC<SectionItemProps> = (props) => {
 
   const [domainId, setDomainId] = useState(Date.now())
 
-  const calculateTotalProportion = (domains: Domain[]) => {
+  const calculateTotalProportion = (domains: DomainType[]) => {
     return domains.reduce((pre, cur) => pre + cur.proportion, 0)
   }
   const currentTotalProportion = useMemo(() => calculateTotalProportion(props.section.domains), [props.section.domains])
@@ -50,11 +49,11 @@ const SectionItem: React.FC<SectionItemProps> = (props) => {
     props.update(props.section, props.seq)
   }
 
-  const domainList = props.section.domains?.map((domain: Domain, index: number) => (
+  const domainList = props.section.domains?.map((domain: DomainType, index: number) => (
     <DomainItem
       key={domain.id}
       domain={domain}
-      update={(domain: Domain, seq: number) => updateSectionInfo('domains', { domain, seq })}
+      update={(domain: DomainType, seq: number) => updateSectionInfo('domains', { domain, seq })}
       deleteDomain={deleteDomain}
     />
   ))

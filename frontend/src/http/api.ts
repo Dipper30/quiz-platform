@@ -1,20 +1,14 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
 import { BASE_URL as url, PORT as port } from '../config/env'
 import { errorMessage, getToken } from '../utils'
-import { APIResponse } from '../vite-env'
 
 const env = import.meta.env
 const { MODE } = env
 const BASE_URL: string = url[MODE]
 const PORT: string = port[MODE]
 
-// const apiBaseURL = env.SERVER_URL + '/api/v1'
-// const apiBaseURL = process.env.REACT_APP_ENVIRONMENT == 'local' ? 'http://10.215.23.201:8080/api/v1' : 
-  // (process.env.REACT_APP_ENVIRONMENT == 'development' ? 'http://localhost:8080/api/v1' : '')
 export const apiBaseURL = 'http://' + BASE_URL +':' + PORT + '/api/v1'
 console.log('base_url', env, apiBaseURL)
-// export const apiBaseURL = `//${window.location.host}/api/v1`;
-// export const baseURL = `//${window.location.host}/signing-up`;
 
 export const mHttpConfig = {
   warn: 0,
@@ -47,15 +41,7 @@ http.interceptors.response.use(
       // token error
       errorMessage('You are not authorized! Please log in as Admin.')
       return { code, msg }
-    // case 10003:
-    //   console.log('not authorized')
-    //   window.open('no-auth')
-    //   break
     default:
-      // if (mHttpConfig.warn === 0) {
-      //   ElMessage.error('网络错误：' + msg);
-      // }
-      // throw msg;
       return data
     }
   },

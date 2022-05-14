@@ -1,6 +1,5 @@
 import reduxStore from '../store'
 import { message } from 'antd'
-import { APIResponse } from '../vite-env'
 
 /**
  * check if the result from request is instance of Error

@@ -1,5 +1,4 @@
 import api from '../../http'
-import { User } from '../../vite-env'
 
 export const setUser = (data: User) => ({ type: 'setUser', data })
 

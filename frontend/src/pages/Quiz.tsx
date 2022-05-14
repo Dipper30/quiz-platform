@@ -46,17 +46,19 @@ const Quiz: React.FC<QuizProps> = (props) => {
     const quizId = Number(params.id)
     setQuizId(quizId)
     setSubmission({ quizId, parts: [] })
+    onStart(quizId)
   }, [])
 
   const getParts = (quiz: any) => {
-    return quiz ?
+    return quiz?.sections?.length ?
       quiz.sections.reduce(
-        (prev: any, section: any) =>
+        (prev: any, section: any, index: number) =>
           [...prev, ...section.domains.reduce(
           (prev: any, domain: any) => [...prev, ...domain.parts.map(
             (part: any) => {
               part.domainName = domain.name || 'domain'
               part.sectionName = section.title || 'section'
+              part.sectionIndex = index + 1
               return part
             })]
           , [])]
@@ -70,21 +72,19 @@ const Quiz: React.FC<QuizProps> = (props) => {
     parts.length > 0 && setPartId(parts[0].id)
   }, [parts])
 
-  const onStart = () => {
-    if (lock) return
-    setLock(true)
+  const onStart = (quizId: number) => {
     getQuizById(quizId)
   }
 
   const getQuizById = async (qid: number) => {
     //
     const res = await api.getQuizById(qid)
-    setLock(false)
     if (!handleResult(res, false)) return
     setQuiz(res.data.quiz)
     console.log(res.data.quiz)
     setState('undergoing')
     const parts = getParts(res.data.quiz)
+    console.log('@@@ ', parts)
   }
 
   const updatePart = (newPart: SubmissionPart) => {
@@ -129,7 +129,8 @@ const Quiz: React.FC<QuizProps> = (props) => {
     <div className='quiz-container'>
       {
         state == 'before' && (
-          <Button className='start-btn' onClick={onStart} loading={lock}> Start Quiz </Button>
+          <h1> Loading... </h1>
+          // <Button className='start-btn' onClick={onStart} loading={lock}> Start Quiz </Button>
         )
       }
       {

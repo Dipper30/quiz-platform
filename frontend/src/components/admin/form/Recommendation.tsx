@@ -1,6 +1,4 @@
-import { useState } from 'react'
-import { SeqType, Recommendation as RecommendationType } from '../../../vite-env'
-import { Input, InputNumber, Checkbox } from 'antd'
+import { Input, InputNumber } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
 
 type RecommendationProps = {

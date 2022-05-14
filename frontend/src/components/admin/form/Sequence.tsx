@@ -1,5 +1,4 @@
 import { InputNumber } from 'antd'
-import { SeqType } from '../../../vite-env'
 
 type SequenceProps = {
   seq: number,

@@ -1,0 +1,43 @@
+@triangle-width: 8px;
+
+.button-container {
+  background-color: @deep-blue;
+  border-radius: 15px;
+  padding: 4px 12px;
+  position: relative;
+  cursor: pointer;
+
+  &.left {
+    padding-left: calc(20px + @triangle-width);
+  }
+
+  &.right {
+    padding-right: calc(20px + @triangle-width);
+  }
+
+  .left-arrow, .right-arrow {
+    height: @triangle-width;
+    position: absolute;
+    top: 11px;
+    border-bottom: @triangle-width solid transparent;
+    border-top: @triangle-width solid transparent;
+  }
+
+  .left-arrow {
+    left: 2px;
+    border-right: @triangle-width solid @yellow;
+    border-left: @triangle-width solid transparent;
+  }
+
+  .right-arrow {
+    right: 2px;
+    border-right: @triangle-width solid transparent;
+    border-left: @triangle-width solid @yellow;
+  }
+
+  .text {
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: #fff;
+  }
+}
