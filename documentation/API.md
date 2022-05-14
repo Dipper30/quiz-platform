@@ -215,13 +215,6 @@
           is_multi: Boolean,
           part_id: Number,
           imgSrc: String | NULL,
-          partChoices: [
-            id: Number,
-            description: String,
-            seq: Number,
-            show_sub: Boolean,
-
-          ],
           choices: [
             {
               id: Number,

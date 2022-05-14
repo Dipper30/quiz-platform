@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PartChoice as PartChoiceType, SeqType } from '../../../vite-env'
 import Sequence from './Sequence'
 import { Input, Checkbox } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
