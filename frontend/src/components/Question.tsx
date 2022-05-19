@@ -9,6 +9,7 @@ type QuestionProps = {
   question: QuestionType,
   seq: number,
   isSubQuestion: boolean,
+  currentSelected?: number[],
   update: (choice: SubmissionChoice) => void
 }
 
@@ -41,7 +42,7 @@ const Question: React.FC<QuestionProps> = (props) => {
   return (
     <div className='question-container'>
       <div className='description'>
-        { props.question.description ||
+        { props.question?.description ||
           `In this part, we will focus on ${props.question.name}.`
         }
         { props.question.isMulti &&
@@ -53,7 +54,7 @@ const Question: React.FC<QuestionProps> = (props) => {
           props.question.choices.map((c: ChoiceType, index: number) => (
             <div key={c.id} className='choice-container'>
               <Checkbox
-                checked={selectedPartChoices.includes(Number(c.id))}
+                checked={props.isSubQuestion ? props.currentSelected?.includes(Number(c.id)) : selectedPartChoices.includes(Number(c.id))}
                 onClick={() => toggleSelected(Number(c.id))}
               />
               <div

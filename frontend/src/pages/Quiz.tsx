@@ -6,6 +6,8 @@ import { withRouter } from '../utils/pureFunctions'
 import { deepClone, handleResult } from '../utils'
 import './Quiz.less'
 import QuizPart from './QuizPart'
+import { useDispatch } from 'react-redux'
+import { setResult } from '@/store/actions/result'
 
 type QuizProps = {
 }
@@ -41,6 +43,7 @@ const Quiz: React.FC<QuizProps> = (props) => {
   })
   const params = useParams()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const quizId = Number(params.id)
@@ -112,7 +115,8 @@ const Quiz: React.FC<QuizProps> = (props) => {
     const res = await api.submitQuiz(submission)
     if (!handleResult(res)) return
     const { data } = res
-    navigate('/result', { state: { quiz: data.quiz } })
+    dispatch(setResult(data.quiz))
+    navigate('/result')
   }
 
   const goNextPart = () => {

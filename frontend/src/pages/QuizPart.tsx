@@ -3,8 +3,10 @@ import { choiceSeq } from '../config/choices'
 import { Checkbox, Button } from 'antd'
 import { SubmissionChoice, SubmissionPart } from './Quiz'
 import Question from '@/components/Question'
+import QuestionList from '@/components/QuestionList'
 import SectionTitle from '@/components/SectionTitle'
 import PartTitle from '@/components/PartTitle'
+import MyButton from '@/components/Button'
 
 import { deepClone, errorMessage, handleResult } from '../utils'
 import api from '../http'
@@ -30,10 +32,6 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
     },
   )
 
-  // useEffect(() => {
-
-  // }, [props.currentPartId])
-
   const getQuestions = async () => {
     const res = await api.getQuestionsByPartId(
       props.part.id,
@@ -48,6 +46,7 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
     }
     
     // render questions
+    console.log('set quesitons ', res.data.questions)
     setQuestions(res.data.questions)
   }
 
@@ -57,7 +56,7 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
       errorMessage('Please select your choice.')
       return
     }
-    getQuestions()
+    await getQuestions()
   }
 
   const updatePartChoice = (choice: SubmissionChoice) => {
@@ -115,20 +114,20 @@ const QuizPart: React.FC<QuizPartProps> = (props) => {
                   update={updatePartChoice}
                 />
               </div>
-              <Button onClick={confirmPartChoice}> Confirm </Button>
+              <div className='buttons'>
+                <div></div>
+                <MyButton style='right' onClick={confirmPartChoice}> NEXT </MyButton>
+              </div>
             </div>
           ) : (
             <div className='question-list'>
-              { questions && questions.map((q: QuestionType, index: number) => (
-                <Question
-                  key={q.id}
-                  isSubQuestion={true}
-                  question={q}
-                  seq={index + 1}
-                  update={updateQuestion}
-                />
-              )) }
-              <Button onClick={submitQuestions}> Submit </Button>
+              { questions?.length
+                ? <QuestionList
+                    questions={questions}
+                    updateQuestion={updateQuestion}
+                    submitQuestions={submitQuestions}
+                  />
+                : '' }
             </div>
           )
         }

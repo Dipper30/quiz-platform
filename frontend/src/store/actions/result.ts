@@ -1,0 +1,1 @@
+export const setResult = (data: User) => ({ type: 'setResult', data })

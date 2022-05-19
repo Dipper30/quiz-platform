@@ -1,10 +1,8 @@
 const initialState = {
-  username: '',
-  id: 0,
-  chatroomId: null,
+  score: 90,
 }
 
-const userReducer = (preState: any = initialState, action: any) => {
+const resultReducer = (preState: any = initialState, action: any) => {
   const { type, data } = action
   switch (type) {
   case 'setResult':
@@ -14,4 +12,4 @@ const userReducer = (preState: any = initialState, action: any) => {
   }
 }
 
-export default userReducer
+export default resultReducer
