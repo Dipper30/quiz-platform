@@ -167,9 +167,11 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     if (!handleResult(res, false)) return
 
     // upload images
-
-    const uploaded = await api.uploadImage(imgList, { qid: res.data.question.id })
-    if (!handleResult(uploaded)) return
+    if (imgList.length > 0) {
+      const uploaded = await api.uploadImage(imgList, { qid: res.data.question.id })
+      setImgList([])
+      if (!handleResult(uploaded)) return
+    }
 
     dropQuestion()
     props.update(res.data.question)

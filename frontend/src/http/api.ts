@@ -8,7 +8,7 @@ const BASE_URL: string = url[MODE]
 const PORT: string = port[MODE]
 
 export const apiBaseURL = 'http://' + BASE_URL +':' + PORT + '/api/v1'
-// console.log('base_url', env, apiBaseURL)
+// export const apiBaseURL = 'http://' + BASE_URL +':3030' + '/api/v1'
 
 export const mHttpConfig = {
   warn: 0,

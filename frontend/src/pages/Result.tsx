@@ -71,7 +71,7 @@ const Result: React.FC<ResultProps> = (props) => {
         for (const part of domain.parts) {
           const { score, recommendations, totalPoints } = part
           for (const r of recommendations) {
-            if (totalPoints && ((score / totalPoints) <= r.show_under)) {
+            if (totalPoints && ((score / totalPoints) <= (r.show_under / 100))) {
               rec.push(r)
               break
             }
