@@ -2,7 +2,6 @@ import './Quiz.less'
 import { useEffect, useState } from 'react'
 import api from '../../http'
 import { errorMessage, handleResult } from '../../utils'
-import { Quiz as QuizType } from '../../vite-env'
 import QuizAbstract from './QuizAbstract'
 
 type QuizProps = {

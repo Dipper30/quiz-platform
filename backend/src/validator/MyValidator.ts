@@ -1,7 +1,5 @@
-
-import { INTEGER } from "sequelize/types"
-import { isArray, isString, isEmptyValue, isNumber, isBoolean } from "../utils/tools"
-import { isBetween, isNumeric } from "../utils/validate"
+import { isArray, isString, isEmptyValue, isNumber, isBoolean } from '../utils/tools'
+import { isBetween, isNumeric } from '../utils/validate'
 
 class MyValidator {
 

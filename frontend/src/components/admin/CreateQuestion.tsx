@@ -5,6 +5,7 @@ import { CloseCircleOutlined } from '@ant-design/icons'
 import api from '../../http'
 import './CreateQuestion.less'
 import { choiceSeq } from '../../config/choices'
+import ImageUploader from '../ImageUploader'
 
 const { TextArea } = Input
 
@@ -74,7 +75,7 @@ export const CreateChoice: React.FC<CreateChoiceProps> = (props) => {
 type CreateQuestionProps = {
   part: PartType,
   createQuestion: () => void,
-  resize?: () => void,
+  resize: () => void,
   update: (question: QuestionType) => void,
 }
 
@@ -105,6 +106,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
   const [associates, setAssociates] = useState<number[]>([])
   const [init, setInit] = useState<boolean>(false)
   const [lock, setLock] = useState<boolean>(false)
+  const [imgList, setImgList] = useState<any>([])
 
   const availablePartChoices = useMemo(() => props.part.choices.map((c: PartChoiceType, index: number) => ({ alpha: choiceSeq[index + 1], id: c.id, show_sub: c.show_sub })).filter((c: any) => c.show_sub), [props.part])
 
@@ -162,7 +164,13 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     setLock(true)
     const res = await api.createQuestion(question)
     setLock(false)
-    if (!handleResult(res)) return
+    if (!handleResult(res, false)) return
+
+    // upload images
+
+    const uploaded = await api.uploadImage(imgList, { qid: res.data.question.id })
+    if (!handleResult(uploaded)) return
+
     dropQuestion()
     props.update(res.data.question)
     setAssociates([])
@@ -204,6 +212,11 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     </div>
   ))
 
+  const setImg = (data: any) => {
+    setImgList(data)
+    props.resize()
+  }
+
   return (
     <div className='admin-create-question-container'>
       {
@@ -229,6 +242,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
               // placeholder={question.description}
               onChange={(e: any) => updateQuestionInfo('description', e.target.value)}
             />
+            <ImageUploader resize={props.resize} maxImgCount={6} setImgList={(data: any) => setImg(data)}></ImageUploader>
             { choiceList }
             <Button onClick={addChoice}> Add Choice </Button>
             <div className='row'>

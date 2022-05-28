@@ -5,6 +5,7 @@ import { Validator } from '../types/common'
 import { queryIsNull } from '../utils/tools'
 import { ParameterException } from '../exception'
 import { errCode } from '../config'
+import { createError } from '../utils/validate'
 
 class BaseValidator {
 
@@ -102,6 +103,15 @@ class BaseValidator {
     const emailExp = /^[0-9a-zA-Z_.-]+[@][0-9a-zA-Z_.-]+([.][a-zA-Z]+){1,2}$/
     return emailExp.test(email)
 
+  }
+
+  static checkRule (rules: any[]) {
+    for (const rule of rules) {
+      if (!rule.isValid) {
+        return createError(rule.msg ?? undefined)
+      }
+    }
+    return true
   }
 
 }

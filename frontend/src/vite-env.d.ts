@@ -88,6 +88,7 @@ interface QuestionType {
   partChoices?: any[],
   is_multi?: boolean,
   name?: string,
+  imgList?: any[],
 }
 
 interface ChoiceType {

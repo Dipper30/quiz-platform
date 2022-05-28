@@ -64,3 +64,10 @@ export const getRecords = (qid: number) => {
 export const submitQuiz = (data: any) => {
   return post('submit', data)
 }
+
+/**
+ * upload question images
+ */
+ export const uploadImage = (files: File[], params: any) => {
+  return uploadFiles('/image', files, params)
+}

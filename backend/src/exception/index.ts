@@ -3,7 +3,7 @@ import ParameterException from './ParameterException'
 import DatabaseException from './DatabaseException'
 import TokenException from './TokenException'
 import QuizException from './QuizException'
-
+import FileException from './FileException'
 
 export {
   AuthException,
@@ -11,4 +11,5 @@ export {
   DatabaseException,
   TokenException,
   QuizException,
+  FileException,
 }

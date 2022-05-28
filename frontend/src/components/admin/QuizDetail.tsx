@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import api from '../../http'
 import { handleResult } from '../../utils'
-import { Part, Quiz } from '../../vite-env'
 import PartDetail from './PartDetail'
 import QuizAbstract from './QuizAbstract'
 import './QuizDetail.less'
@@ -11,7 +10,7 @@ type QuizDetailProps = {
   
 }
 
-const initQuiz: Quiz = {
+const initQuiz: QuizType = {
   title: '',
   tag: '',
   description: 'descriptions...',
@@ -23,8 +22,8 @@ const initQuiz: Quiz = {
 const QuizDetail: React.FC<QuizDetailProps> = (props) => {
 
   const currentId = Number(useParams().id)
-  const [quiz, setQuiz] = useState<Quiz>(initQuiz)
-  const [parts, setParts] = useState<Part[]>([])
+  const [quiz, setQuiz] = useState<QuizType>(initQuiz)
+  const [parts, setParts] = useState<PartType[]>([])
 
   const getQuizById = async (id: number) => {
     const res = await api.getQuizById(id)
@@ -42,7 +41,7 @@ const QuizDetail: React.FC<QuizDetailProps> = (props) => {
   }, [quiz])
 
   const getParts = () => {
-    let parts: Part[] = []
+    let parts: PartType[] = []
     if (!quiz?.sections) return []
     for (const section of quiz.sections) {
       for (const domain of section.domains) {

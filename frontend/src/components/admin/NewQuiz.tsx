@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Input, InputNumber, Button, Popconfirm } from 'antd'
 import './NewQuiz.less'
 import { deepClone, errorMessage, handleResult, isEmptyValue, successMessage } from '../../utils'
-import { APIResponse, Domain, Quiz, Section } from '../../vite-env'
 import DomainItem from './form/DomainItem'
 import SectionItem from './form/SectionItem'
 import api from '../../http'
@@ -13,7 +12,7 @@ type AdminNewQuizProps = {
   
 }
 
-const initQuiz: Quiz = {
+const initQuiz: QuizType = {
   title: 'MyQuiz',
   tag: '',
   description: 'descriptions...',
@@ -51,7 +50,6 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
         quiz.sections[seq] = section
         break
       case 'sections': // update sections according to input
-        console.log(sectionStr)
         const sections = sectionStr.split(',').map((sectionName: string) => ({ title: sectionName, domains: [] }))
         quiz.sections = sections
         break
@@ -80,7 +78,7 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
     setQuiz(deepClone(initQuiz))
   }
 
-  const calculateTotalProportion = (domains: Domain[]) => {
+  const calculateTotalProportion = (domains: DomainType[]) => {
     return domains.reduce((pre, cur) => pre + cur.proportion, 0)
   }
 
@@ -102,21 +100,21 @@ const AdminNewQuiz: React.FC<AdminNewQuizProps> = (props) => {
     setQuiz(deepClone(initQuiz))
   }
 
-  const sectionList = quiz.sections?.map((section: Section, index: number) => (
+  const sectionList = quiz.sections?.map((section: SectionType, index: number) => (
     <SectionItem
       // eslint-disable-next-line react/no-array-index-key
       key={index}
       seq={index}
       section={section}
-      update={(section: Section, seq: number) => updateQuizInfo('section', { section, seq })}
+      update={(section: SectionType, seq: number) => updateQuizInfo('section', { section, seq })}
     />
   ))
 
-  const domainList = quiz.domains?.map((domain: Domain, index: number) => (
+  const domainList = quiz.domains?.map((domain: DomainType, index: number) => (
     <DomainItem
       key={domain.id}
       domain={domain}
-      update={(domain: Domain, seq: number) => updateQuizInfo('domains', { domain, seq })}
+      update={(domain: DomainType, seq: number) => updateQuizInfo('domains', { domain, seq })}
       deleteDomain={deleteDomain}
     />
   ))

@@ -5,6 +5,7 @@ type ButtonStyle = 'left' | 'right'
 type ButtonProps = {
   children: any,
   style: ButtonStyle,
+  loading?: boolean,
   onClick?: () => void,
 }
 
@@ -12,8 +13,8 @@ const Button: React.FC<ButtonProps> = (props) => {
 
   return (
     <div
-      className={ `button-container${props.style === 'left' ? ' left' : ' right'}` }
-      onClick={() => props.onClick && props.onClick()}  
+      className={ `button-container${props.style === 'left' ? ' left' : ' right'}${props.loading === true ? ' loading': ''}` }
+      onClick={() => !props.loading && props.onClick && props.onClick()}  
     >
       {
         props.style === 'left' ?

@@ -3,11 +3,11 @@ import { Button } from 'antd'
 import api from '../http'
 import { useNavigate, useParams } from 'react-router-dom'
 import { withRouter } from '../utils/pureFunctions'
-import { deepClone, handleResult } from '../utils'
+import { deepClone, errorMessage, handleResult } from '../utils'
 import './Quiz.less'
 import QuizPart from './QuizPart'
 import { useDispatch } from 'react-redux'
-import { setResult } from '@/store/actions/result'
+import { setLoading, setResult } from '@/store/actions/result'
 
 type QuizProps = {
 }
@@ -84,17 +84,12 @@ const Quiz: React.FC<QuizProps> = (props) => {
     const res = await api.getQuizById(qid)
     if (!handleResult(res, false)) return
     setQuiz(res.data.quiz)
-    console.log(res.data.quiz)
     setState('undergoing')
     const parts = getParts(res.data.quiz)
-    console.log('@@@ ', parts)
   }
 
   const updatePart = (newPart: SubmissionPart) => {
-    const { pid } = newPart
     let hasRecord = false
-    console.log('current ', submission)
-    console.log('get ', newPart)
     for (let part of submission.parts) {
       if (part.pid === newPart.pid) {
         hasRecord = true
@@ -106,26 +101,29 @@ const Quiz: React.FC<QuizProps> = (props) => {
       submission.parts.push(newPart)
     }
     setSubmission(deepClone(submission))
-    setTimeout(() => console.log(submission), 10)
-    
   }
 
   const submitQuiz = async () => {
-    console.log('submit ! ', submission)
-    const res = await api.submitQuiz(submission)
-    if (!handleResult(res)) return
-    const { data } = res
-    dispatch(setResult(data.quiz))
+    dispatch(setLoading(true))
+    api.submitQuiz(submission).then(res => {
+      if (!handleResult(res)) return
+      const { data } = res
+      dispatch(setResult(data.quiz))
+      dispatch(setLoading(false))
+    })
+    .catch(err => {
+      errorMessage(err)
+      dispatch(setLoading(false))
+    })
     navigate('/result')
   }
 
-  const goNextPart = () => {
+  const goNextPart = async () => {
     if (parts.length > currentPartIndex + 1) {
       setPartId(parts[currentPartIndex + 1].id)
       setCurrentPartIndex(currentPartIndex + 1)
     } else {
       submitQuiz()
-      console.log('reach end of quiz!')
     }
   }
 
@@ -146,6 +144,7 @@ const Quiz: React.FC<QuizProps> = (props) => {
               part={part}
               visible={partId===part.id}
               update={updatePart}
+              reachEnd={parts.length === currentPartIndex + 1}
               goNext={goNextPart}
             />
           ))

@@ -17,7 +17,6 @@ const Home: React.FC<any> = (props: any) => {
 
   const fetchQuizzes = async () => {
     const res = await api.getQuizzesInfo()
-    console.log(res)
     if (!handleResult(res, false)) return
     const { data } = res
     data.quizzes.length && getQuizById(data.quizzes[0].id)
@@ -37,7 +36,6 @@ const Home: React.FC<any> = (props: any) => {
     const res = await api.getQuizById(qid)
     if (!handleResult(res, false)) return
     setQuiz(res.data.quiz)
-    console.log('@@@@@?', res.data.quiz)
   }
 
   const quizList = quizzes.map((quiz) => (

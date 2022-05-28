@@ -52,6 +52,7 @@ export interface Question {
   partId: Number,
   partChoices: Number[],
   choices: Choice[],
+  imgList?: any[],
 }
 
 export interface Choice {

@@ -1,12 +1,13 @@
 import fs from 'fs'
 import os from 'os'
-import path from 'path'
+import { errCode } from '../config'
 // import { Parser } from 'json2csv'
-import { ParameterException } from '../exception'
+import { FileException, ParameterException, QuizException } from '../exception'
 import {
   TokenService,
   QuizService,
 } from "../service"
+import FileService from '../service/FileService'
 import { Choice, InitQuiz, Question } from "../types"
 import { isEmptyValue, isError } from "../utils/tools"
 import BaseController from "./BaseController"
@@ -132,6 +133,9 @@ class Quiz extends BaseController {
       const deleted = await QuizService.deleteQuestion(data)
       if (isError(deleted)) throw deleted
 
+      const deleteImage = await FileService.delDirRecursive(`images/questions/${data.id}/all`)
+      if (!deleteImage) throw new FileException(errCode.FILE_ERROR, 'images not deleted properly')
+
       res.json({
         code: 201,
         msg: 'deleted',
@@ -253,12 +257,49 @@ class Quiz extends BaseController {
       const quiz = await QuizService.calculateScore(historyId)
       if (isError(quiz)) throw quiz
 
-      res.json({
-        code: 200,
-        msg: 'ok',
-        data: {
-          historyId,
-          quiz,
+      const qid = req.body.quizId
+      const hid = historyId
+      const outputFileName = `r/output${qid}.csv`
+
+      const line = await QuizService.generateScoreLine(quiz)
+      if (line && !isError(line)) {
+        fs.appendFileSync(outputFileName, line + '\n')
+      }
+
+      if (!fs.existsSync(outputFileName)) {
+        const init = await QuizService.initCSVFileByQuizId(qid)
+        if (isError(init)) throw init
+      }
+
+      const exec = require('child_process').exec
+
+      exec(`rscript r/score.R r/output${qid}.csv`, (error: any, stdout: string, stderr: string) => {
+        console.log({ error, stdout, stderr })
+       
+        if (error) {
+          quiz.overallScore = 0
+          console.log(error)
+          res.json({
+            code: 200,
+            msg: 'ok',
+            data: {
+              historyId,
+              quiz,
+            }
+          })
+        } else {
+          const re = /\s(\S+)/g
+          const arr = re.exec(stdout)
+          const score = (arr && arr.length > 1) ? arr[1] : 0
+          quiz.overallScore = score
+          res.json({
+            code: 200,
+            msg: 'ok',
+            data: {
+              historyId,
+              quiz,
+            },
+          })
         }
       })
     } catch (error) {
@@ -286,76 +327,115 @@ class Quiz extends BaseController {
   }
 
   /**
-   * get csv file
+   * get csv file by quiz id
    */
-  async getRecords (req: any, res: any, next: any): Promise<any> {
-    const strOutputFileName = 'records/output.csv'
-    const fWrite = fs.createWriteStream(strOutputFileName)  
+  async getScoreCSVDataByQuizId (req: any, res: any, next: any): Promise<any> {
+ 
     try {
+      
       const { id } = req.params // quiz id
       if (!id) throw new ParameterException()
-      const historyIdList = await QuizService.findAllHistoriesByQuizId(id)
-      if (isError(historyIdList)) throw historyIdList
+      const init = await QuizService.initCSVFileByQuizId(id)
+      if (isError(init)) throw init
 
-      let headers = ''
-      // write to file by line
-      for (const hid of historyIdList) {
-        const record = await QuizService.calculateScore(hid)
-        let line = ''
-        for (const section of record.sections) {
-          for (const domain of section.domains) {
-            for (const part of domain.parts) {
-              for (let index = 0; index < part.questions.length; index++) {
-                const score = part.questions[index].score || 0
-                if (!line) line += score
-                else line += (',' + score)
-              }
-            }
-          }
-        }
-        if (!headers) {
-          const len = line.split(',').length
-          for (let i = 0; i < len; i++) {
-            if (i === 0) headers += 'Q' + (i + 1)
-            else headers += ',Q' + (i + 1)
-          }  
-          fWrite.write(headers + os.EOL)
-        }
-        fWrite.write(line + os.EOL)
-      }
-
-      var options = {
-        root: path.join(__dirname)
-      }
-      res.sendFile('output.csv', { root: 'records' }, function (err: any, data: any) {
+      res.sendFile(`output${id}.csv`, { root: 'r' }, function (err: any, data: any) {
         if (err) {
           res.writeHead(404)
           res.end(JSON.stringify(err))
           return
         }
       })
-      // fs.readFile('records/output.csv', function (err: any, data: any) {
-      //   if (err) {
-      //     res.writeHead(404)
-      //     res.end(JSON.stringify(err))
-      //     return
-      //   }
-      //   res.header('Content-Type', 'text/csv')
-      //   res.writeHead(200)
-      //   res.end(data)
-      // })
-      // const csv = JSONToCSV(req.body, { fields: ["Customer Name", "Business Name", "Customer Email", "Customer ID", "School ID", "Student Count", "Admin Count", "Courses Count" ]})
-      // res.header('Content-Type', 'text/csv');
-      // res.attachment('output.csv')
-      // res.send(csv)
-      // res.json({
-      //   msg: 'ok'
-      // })
+
     } catch (error) {
       next(error)
-    } finally {
-      fWrite.close()
+    }
+  }
 
+  /**
+   * get model score by history id
+   */
+  async getScore (req: any, res: any, next: any): Promise<any> {
+    try {
+      let { qid, hid } = req.query
+      if (!qid || !hid) throw new ParameterException()
+      hid = Number(hid) || 0
+      qid = Number(qid) || 0
+      const outputFileName = `r/output${qid}.csv`
+
+      if (!fs.existsSync(outputFileName)) {
+        const init = await QuizService.initCSVFileByQuizId(qid)
+        if (isError(init)) throw init
+      }
+      
+      const exec = require('child_process').exec
+
+      exec(`rscript r/score.R output${qid}.csv`, (error: any, stdout: string, stderr: string) => {
+        console.log({ error, stdout, stderr })
+        if (error) {
+          res.json({
+            code: errCode.QUIZ_ERROR,
+            msg: 'error',
+            data: error,
+          })
+        } else {
+          const re = /\s(\S+)/g
+          const arr = re.exec(stdout)
+          const score = (arr && arr.length > 1) ? arr[1] : 0
+          res.json({
+            code: 200,
+            msg: 'ok',
+            data: score,
+          })
+        }
+      })
+      
+    
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async uploadImage (req: any, res: any, next: any): Promise<any> {
+    try {
+      const { files } = req
+      console.log(req.body)
+      console.log(req.file)
+      const data: { qid: number } = req.body
+      console.log('@file ', files, data)
+
+      if (!files) throw new FileException(errCode.NO_FILE_UPLOADED)
+      if (!data || !data.qid) throw new FileException(errCode.FILE_ERROR, 'Require Quesiton ID.')
+      
+      const uploaded = await FileService.writeImage(files.file, data)
+      if(isError(uploaded)) throw uploaded
+
+      if (uploaded) {
+        res.json({
+          code: 201,
+          msg: 'uploaded',
+        })
+      }
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  async getImage (req: any, res: any, next: any): Promise<any> {
+    try {
+      const { qid } = req.query
+      if (!qid) throw new ParameterException()
+
+      let imgList = await FileService.readImage(Number(qid))
+      if (!imgList || isError(imgList)) imgList = []
+
+      res.json({
+        code: 200,
+        data: {
+          imgList,
+        },
+      })
+    } catch (error) {
+      next(error)
     }
   }
 

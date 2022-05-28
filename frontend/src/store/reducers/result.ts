@@ -1,12 +1,17 @@
-const initialState = {
-  score: 90,
+const initialState: {
+  loading: boolean,
+  data: any,
+} = {
+  loading: false,
+  data: null,
 }
-
 const resultReducer = (preState: any = initialState, action: any) => {
   const { type, data } = action
   switch (type) {
   case 'setResult':
-    return data
+    return { ...preState, data }
+  case 'setLoading':
+    return { ...preState, loading: data }
   default:
     return preState
   }

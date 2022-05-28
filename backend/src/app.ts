@@ -1,5 +1,6 @@
 const express = require('express')
 const router = require('./router/index.ts')
+const fileUpload = require('express-fileupload') 
 import fs from 'fs'
 require('dotenv').config()
 
@@ -7,6 +8,7 @@ const app = express()
 
 app.use(express.json({ limit: '20mb' }))
 app.use(express.urlencoded({ extended: true }))
+app.use(fileUpload({ limits: { fileSize: 1024 * 1024 * 20 } })) // <= 20MB
 app.use(express.static('build'))
 
 app.all('*', async (req: any, res: any, next: any) => {
@@ -60,6 +62,6 @@ app.use((err: any, req: any, res: any, next: any) => {
   }
 })
 
-app.listen(3030, () => {
+app.listen(3000, () => {
   console.log('Quiz Platform Started!', process.env.USERNAME)
 })

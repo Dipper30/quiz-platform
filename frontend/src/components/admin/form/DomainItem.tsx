@@ -1,15 +1,14 @@
 import { InputNumber, Input, Button } from 'antd'
 import { useState } from 'react'
-import { Domain, Part, SeqType } from '../../../vite-env'
 import PartItem from './PartItem'
 import Sequence from './Sequence'
 import { UnorderedListOutlined } from '@ant-design/icons'
 
 type DomainItemProps = {
   // key: number,
-  domain: Domain,
+  domain: DomainType,
   deleteDomain: (seq: number) => void,
-  update: (domain: Domain, seq: number) => void,
+  update: (domain: DomainType, seq: number) => void,
 }
 
 const DomainItem: React.FC<DomainItemProps> = (props) => {
@@ -38,12 +37,13 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
 
   const addNewPart = () => {
     const { parts } = props.domain
-    const part: Part = {
+    const part: PartType = {
       partName: 'new part',
       id: partId,
       seq: props.domain.parts.length + 1,
       choices: [],
       recommendations: [],
+      description: 'description...',
     }
     setPartId(partId + 1)
     parts.push(part)
@@ -63,7 +63,7 @@ const DomainItem: React.FC<DomainItemProps> = (props) => {
     setPartsCollapsed(!partsCollapsed)
   }
 
-  const partList = props.domain?.parts?.map((part: Part, index: number) => (
+  const partList = props.domain?.parts?.map((part: PartType, index: number) => (
     <PartItem
       key={part.id}
       part={part}

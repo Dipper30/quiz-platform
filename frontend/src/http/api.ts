@@ -8,7 +8,7 @@ const BASE_URL: string = url[MODE]
 const PORT: string = port[MODE]
 
 export const apiBaseURL = 'http://' + BASE_URL +':' + PORT + '/api/v1'
-console.log('base_url', env, apiBaseURL)
+// console.log('base_url', env, apiBaseURL)
 
 export const mHttpConfig = {
   warn: 0,
@@ -73,11 +73,12 @@ export const post = (url: string, params?: any): Promise<APIResponse> => {
 /**
  * file uploader
  */
-export const uploadFiles = (url: string, files: File[], param: any[]) => {
-  // const file = e.target.files[0]
+export const uploadFiles = (url: string, files: File[], param: any): Promise<APIResponse> => {
   const formData = new FormData()
-  for (let p of param) formData.append(p.prop, p.value)
-  for (let file of files) formData.append('file', file)
+  for (const key in param) {
+    formData.append(`${key}`, param[key])
+  }
+  for (const file of files) formData.append('file', file)
   return http.post(url, formData, {
     headers: {
       'Content-Type': 'multipart/form-data;charset=UTF-8',

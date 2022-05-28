@@ -1,1 +1,3 @@
-export const setResult = (data: User) => ({ type: 'setResult', data })
+export const setResult = (data: any) => ({ type: 'setResult', data })
+
+export const setLoading = (isLoading: boolean) => ({ type: 'setLoading', data: isLoading })

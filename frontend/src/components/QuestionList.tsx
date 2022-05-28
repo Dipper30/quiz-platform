@@ -7,6 +7,8 @@ import { SubmissionChoice } from '@/pages/Quiz'
 
 type QuestionListProps = {
   questions: QuestionType[],
+  loading: boolean,
+  reachEnd: boolean,
   updateQuestion: (choice: SubmissionChoice) => void,
   submitQuestions: () => void,
 }
@@ -26,11 +28,10 @@ const QuestionList: React.FC<QuestionListProps> = (props) => {
   }
 
   const submitQuestions = () => {
-    //
+    // check if all questions are answered
   }
 
   const resize = (index: number = 0) => {
-    console.log('resize ', index, selectedChoices, selectedChoices.get(index))
     setCurrentSelected(selectedChoices.get(index) || [])
   }
 
@@ -50,22 +51,6 @@ const QuestionList: React.FC<QuestionListProps> = (props) => {
 
   return (
     <div className='question-list-container'>
-      {/* <div className='question-view-port'>
-        <div className='questions'>
-          {
-            props.questions?.map(question => (
-              <Question
-                key={question.id}
-                isSubQuestion={true}
-                question={props.questions[currentIndex]}
-                seq={currentIndex + 1}
-                update={props.updateQuestion}
-              />
-            ))
-          }
-        </div>
-      </div> */}
-
       <Question
         isSubQuestion={true}
         question={props.questions[currentIndex]}
@@ -90,12 +75,13 @@ const QuestionList: React.FC<QuestionListProps> = (props) => {
         { currentIndex !== 0 ? <MyButton style='left' onClick={prevQuestion}> BACK </MyButton> : <div /> }
         { currentIndex !== props.questions?.length - 1
           ? <MyButton style='right' onClick={nextQuestion}> NEXT </MyButton>
-          : <MyButton style='right' onClick={props.submitQuestions}> NEXT SECTION </MyButton> }
+          : <MyButton style='right' onClick={props.submitQuestions} loading={props.loading}>{ props.reachEnd ? 'SUBMIT' : 'NEXT SECTION' } </MyButton>
+        }
       </div>
       { currentIndex === props.questions?.length - 1 &&
         <>
           <br />
-          <span> { 'Note: this question is the  last question in this section. After clicking "Next Section", you can\'t go back to this section. ' } </span>
+          <span> { 'Note: this question is the last question in this section. After clicking "Next Section", you can\'t go back to this section. ' } </span>
         </>
       }  
     </div>

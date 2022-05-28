@@ -6,10 +6,35 @@
   align-items: flex-start;
   min-width: 700px;
   font-size: 18px;
+
+  .img-large {
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    width: max-content;
+    min-width: 100vw;
+    min-height: 100vh;
+    // width: auto;
+    z-index: 999;
+    justify-content: center;
+    align-items: center;
+    background-color: @grey;
+  }
+
   .description {
     padding: 10px 0;
     margin-bottom: 10px;
     width: 100%;
+  }
+  .img-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    img {
+      max-height: 400px;
+      cursor: zoom-in;
+    }
   }
   .choice-list {
     width: 100%;

@@ -99,3 +99,11 @@ export const deepClone: (<T>(obj: T) => T) = (obj) => {
   return obj
 }
 
+export const createImage = async (imgSrc: string): Promise<CanvasImageSource> => {
+  const image = new Image()
+  
+  return new Promise((resolve, reject) => {
+    image.src = imgSrc
+    setTimeout(() => resolve(image), 10)
+  })
+}

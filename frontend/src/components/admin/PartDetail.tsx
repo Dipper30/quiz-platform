@@ -1,10 +1,9 @@
+/* eslint-disable react/no-array-index-key */
 import { createRef, useEffect, useRef, useState } from 'react'
-import { useStore } from 'react-redux'
-import { Editing, Part, PartChoice, Question } from '../../vite-env'
 import { RightOutlined, DownOutlined } from '@ant-design/icons'
 import { Button, Tag } from 'antd'
 import api from '../..//http'
-import { deepClone, handleResult } from '../../utils'
+import { handleResult } from '../../utils'
 import { CreateQuestion } from './CreateQuestion'
 import { choiceSeq } from '../../config/choices'
 
@@ -21,7 +20,7 @@ const PartHeader: React.FC<PartHeaderProps> = (props) => {
 }
 
 type PartDetailProps = {
-  part: Part,
+  part: PartType,
   editing: Editing,
 }
 
@@ -29,7 +28,7 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
 
   let timer: any = null
   const [collapsed, setCollapsed] = useState(true)
-  const [questions, setQuestions] = useState<Question[]>([])
+  const [questions, setQuestions] = useState<QuestionType[]>([])
   const partRef = useRef<any>()
   const questionsRef = useRef<any>()
   const newQuestionRef = useRef<any>()
@@ -62,7 +61,7 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
     }, 0)
   }
 
-  const updateQuestion = (question: Question) => {
+  const updateQuestion = (question: QuestionType) => {
     getQuestionsByPartId()
     // questions.push(question)
     // setQuestions(deepClone(questions))
@@ -74,18 +73,24 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
     getQuestionsByPartId()
   }
 
-  const partChoiceList = props.part.choices?.map((partchoice: PartChoice, index: number) => (
+  const partChoiceList = props.part.choices?.map((partchoice: PartChoiceType, index: number) => (
     <div key={partchoice.id}> { `${choiceSeq[index + 1]}. ${partchoice.description} ${partchoice.show_sub ? '' : '(will not show sub questions)'}` } </div>
   )) || []
 
-  const questionList = questions?.map((question: Question, index: number) => (
+  const questionList = questions?.map((question: QuestionType, index: number) => (
     <div className='admin-question-container' key={question.id}>
       <span> {index + 1}. </span>
       <Button className='delete-btn' danger onClick={() => deleteQuestion(question.id || 0)}> Delete </Button>
       { question.description } &nbsp;
       { question.is_multi ? <Tag color='green'> Multi </Tag> : '' }
-      {`(associated with ${ question.partChoices && question.partChoices.map((pc: PartChoice) => choiceSeq[props.part?.choices?.findIndex((choice: PartChoice) => choice.seq == pc.seq) + 1]).join(', ') })`}
-      { question.choices.map(c => {
+      {`(associated with ${ question.partChoices && question.partChoices.map((pc: PartChoiceType) => choiceSeq[props.part?.choices?.findIndex((choice: PartChoiceType) => choice.seq == pc.seq) + 1]).join(', ') })`}
+      
+      { question.imgList?.length && (
+        <div className='img-container'>
+          { question.imgList.map((imgSrc: any, index) => <img key={index} src={`data:image/${imgSrc.type};base64,${imgSrc.data}`} alt='img' />) }
+        </div>
+      ) }
+      { question.choices.map((c: any) => {
           return (
             <div key={c.id}> {choiceSeq[c.seq] }. { c.description } <span className='answer-label'> { c.score > 0 ? c.score : '' } </span> </div> 
           )

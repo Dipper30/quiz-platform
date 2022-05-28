@@ -5,6 +5,8 @@ import PartChoice from './PartChoice'
 import { PlusCircleOutlined } from '@ant-design/icons'
 import Recommendation from './Recommendation'
 
+const { TextArea } = Input
+
 type PartItemProps = {
   part: PartType,
   seqType: SeqType,
@@ -17,13 +19,16 @@ const PartItem: React.FC<PartItemProps> = (props) => {
   const [choiceId, setChoiceId] = useState(Date.now())
   const [recommendationId, setRecommendationId] = useState(Date.now())
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  const setSequence = (seq: number) => {} //TODO should support editing sequence
+  const setSequence = (seq: number) => {} // TODO should support editing sequence
 
   const updatePartInfo = (key: string, value: any) => {
     const newPart = props.part
     switch (key) {
       case 'partName':
         newPart.partName = value
+        break
+      case 'description':
+        newPart.description = value
         break
       case 'choices':
         const { choice, seq } = value
@@ -103,6 +108,14 @@ const PartItem: React.FC<PartItemProps> = (props) => {
             <Input defaultValue={props.part.partName} onInput={(e: any) => updatePartInfo('partName', e.target.value)} />
           </div>
           <Button className='delete-btn' danger onClick={() => props.deletePart(props.part.seq)}> Delete </Button>
+        </div>
+        <div className='input-item'>
+          <div className='label'>
+            Part Description:
+          </div>
+          <div className='input-wrapper'>
+            <TextArea defaultValue={props.part.description} onInput={(e: any) => updatePartInfo('description', e.target.value)} />
+          </div>
         </div>
         <div className='section-divider'>
           Choices: {` ${props.part.choices.length}`}

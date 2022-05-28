@@ -1,10 +1,12 @@
-import BaseService from "./BaseService"
+import BaseService from './BaseService'
 import { Op } from 'sequelize'
-import { GetQuiz, Choice, Domain, InitQuiz, Question, Part, Submission } from "../types"
-import { ParameterException, QuizException } from "../exception"
-import { errCode } from "../config"
-import { isEmptyValue, omitFields } from "../utils/tools"
-import { domainToASCII } from "url"
+import { GetQuiz, Choice, Domain, InitQuiz, Question, Part, Submission } from '../types'
+import { ParameterException, QuizException } from '../exception'
+import { errCode } from '../config'
+import { isEmptyValue, isError, omitFields } from '../utils/tools'
+import fs from 'fs'
+import os from 'os'
+import FileService from './FileService'
 
 const models = require('../../db/models/index.js')
 const { sequelize } = require('../../db/models')
@@ -496,6 +498,9 @@ class Quiz extends BaseService {
           attributes: { exclude: excludeAttributes },
         })
         question.choices = choiceModels?.map((choice: any) => choice.dataValues)
+      
+        const imgList = await FileService.readImage(question.id as number)
+        question.imgList = imgList ? imgList : []
       }
 
       return questions
@@ -642,6 +647,7 @@ class Quiz extends BaseService {
             const recommendationModels = await RecommendationModel.findAll({
               where: { part_id: part.id },
               attributes: { exclude: this.excludeAttributes },
+              order: [['show_under', 'desc']],
             })
             part.choices = partChoiceModels.map((v: any) => v.dataValues)
             part.recommendations = recommendationModels.map((v: any) => v.dataValues)
@@ -730,14 +736,6 @@ class Quiz extends BaseService {
     }
   }
 
-  async getRecords (id: number) {
-    try {
-      
-    } catch (error) {
-      return error
-    }
-  }
-
   /**
    * get history ids by quiz id
    * @param qid 
@@ -754,6 +752,70 @@ class Quiz extends BaseService {
     } catch (error) {
       return error
     }
+  }
+
+    /**
+   * write score data to csv file according to quiz id
+   */
+  async initCSVFileByQuizId (qid: number) {
+    const outputFileName = `r/output${qid}.csv`
+    // clear file if already exists
+    if (fs.existsSync(outputFileName)) {
+      await fs.writeFileSync(outputFileName, '')
+    }
+    const fileCreated = await FileService.mkDirRecursive(outputFileName)
+    if (!fileCreated) throw new QuizException(errCode.QUIZ_ERROR, 'File Not Created')
+    try {
+      const historyIdList = await this.findAllHistoriesByQuizId(qid)
+      if (isError(historyIdList)) throw historyIdList
+
+      let data = ''
+      let headers = ''
+      let line = ''
+      // write to file by line
+      for (const hid of historyIdList) {
+        const record = await this.calculateScore(hid)
+        if (!record) break
+        line = this.generateScoreLine(record)
+        if (!headers) {
+          const len = line.split(',').length
+          for (let i = 0; i < len; i++) {
+            if (i === 0) headers += 'Q' + (i + 1)
+            else headers += ',Q' + (i + 1)
+          }
+          data += headers + '\n'
+        }
+        data += line + '\n'
+        line = ''
+      }
+
+      fs.writeFileSync(outputFileName, data)
+      return true
+    } catch (error) {
+      return error
+    }
+  }
+
+  generateScoreLine (score: any) {
+    if (!score) return ''
+    let line = ''
+    for (const section of score.sections) {
+      for (const domain of section.domains) {
+        for (const part of domain.parts) {
+          for (let index = 0; index < part.questions.length; index++) {
+            const score = part.questions[index]?.score ? 1 : 0
+
+            if (!line) line += score
+            else line += (',' + score)
+          }
+        }
+      }
+    }
+    return line
+  }
+
+  async getOverAllScore (qid: number, hid: number) {
+    
   }
 
   findMaxSeq (arr: any[]): number {

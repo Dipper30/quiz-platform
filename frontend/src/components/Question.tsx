@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable react/no-array-index-key */
 import { useEffect, useState } from 'react'
 import { choiceSeq } from '../config/choices'
 import { SubmissionChoice } from '../pages/Quiz'
@@ -16,6 +18,8 @@ type QuestionProps = {
 const Question: React.FC<QuestionProps> = (props) => {
 
   const [selectedPartChoices, setSelectedPartChoices] = useState<number[]>([])
+  const [largeImgVisible, setLargeImgVisible] = useState<boolean>(false)
+  const [currentImgSrc, setCurrentImgSrc] = useState<string>('')
 
   useEffect(() => {
     props.update({ qid: Number(props.question.id), cid: selectedPartChoices })
@@ -38,9 +42,21 @@ const Question: React.FC<QuestionProps> = (props) => {
       hasRecord ? setSelectedPartChoices([]) : setSelectedPartChoices([id])
     }
   }
+  
+  const showFullImg = (src: string) => {
+    setCurrentImgSrc(src)
+    setLargeImgVisible(true)
+  }
 
   return (
     <div className='question-container'>
+      {
+        (largeImgVisible && currentImgSrc) && (
+        <div className='img-large' onClick={() => setLargeImgVisible(false)}>      
+          <img src={currentImgSrc} alt='large-img' />
+        </div>)
+      }
+
       <div className='description'>
         { props.question?.description ||
           `In this part, we will focus on ${props.question.name}.`
@@ -49,6 +65,18 @@ const Question: React.FC<QuestionProps> = (props) => {
           <span> Multiple choices </span>
         }
       </div>
+      { props.question.imgList && (
+        <div className='img-container'>
+          { props.question.imgList.map((imgSrc: any, index) => (
+            <img
+              key={index}
+              src={`data:image/${imgSrc.type};base64,${imgSrc.data}`}
+              alt='img'
+              onClick={() => showFullImg(`data:image/${imgSrc.type};base64,${imgSrc.data}`)}
+            />
+          )) }
+        </div>
+      ) }
       <div className='choice-list'>
         {
           props.question.choices.map((c: ChoiceType, index: number) => (
