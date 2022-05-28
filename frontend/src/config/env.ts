@@ -5,5 +5,5 @@ export const BASE_URL: any = {
 
 export const PORT: any = {
   'development': 3000,
-  'production': 3000,
+  'production': 3030,
 }

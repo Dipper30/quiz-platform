@@ -29,14 +29,10 @@ app.all('*', async (req: any, res: any, next: any) => {
 })
 
 app.get('*', async (req: any, res: any, next: any) => {
-  console.log(req.url)
+  // console.log(req.url)
   if (req.url.substr(0, 4) == '/api') {
     next()
   } else {
-    // res.writeHead(200, {
-    //   'Content-Type': 'text/html',
-    // })
-    // res.end('build/index.html')
     fs.readFile('build/index.html', (err: any, data: any) => {
       if (err) {
         res.writeHead(404)
@@ -62,6 +58,6 @@ app.use((err: any, req: any, res: any, next: any) => {
   }
 })
 
-app.listen(3000, () => {
+app.listen(process.env.NODE_ENV === 'development' ? 3000 : 3030, () => {
   console.log('Quiz Platform Started!', process.env.USERNAME)
 })
