@@ -85,11 +85,11 @@ const PartDetail: React.FC<PartDetailProps> = (props) => {
       { question.is_multi ? <Tag color='green'> Multi </Tag> : '' }
       {`(associated with ${ question.partChoices && question.partChoices.map((pc: PartChoiceType) => choiceSeq[props.part?.choices?.findIndex((choice: PartChoiceType) => choice.seq == pc.seq) + 1]).join(', ') })`}
       
-      { question.imgList?.length && (
+      { question.imgList && question.imgList.length > 0 ? (
         <div className='img-container'>
           { question.imgList.map((imgSrc: any, index) => <img key={index} src={`data:image/${imgSrc.type};base64,${imgSrc.data}`} alt='img' />) }
         </div>
-      ) }
+      ) : '' }
       { question.choices.map((c: any) => {
           return (
             <div key={c.id}> {choiceSeq[c.seq] }. { c.description } <span className='answer-label'> { c.score > 0 ? c.score : '' } </span> </div> 

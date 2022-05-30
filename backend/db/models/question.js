@@ -20,7 +20,6 @@ module.exports = (sequelize, DataTypes) => {
     destroyed: DataTypes.BOOLEAN,
     is_multi: DataTypes.BOOLEAN,
     part_id: DataTypes.INTEGER,
-    img_src: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'Question',

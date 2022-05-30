@@ -2,7 +2,7 @@
   "development": {
     "username": "root",
     "password": "dipper123456",
-    "database": "quiz-db",
+    "database": "quiz",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "dialectOptions": {

@@ -110,6 +110,10 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
 
   const availablePartChoices = useMemo(() => props.part.choices.map((c: PartChoiceType, index: number) => ({ alpha: choiceSeq[index + 1], id: c.id, show_sub: c.show_sub })).filter((c: any) => c.show_sub), [props.part])
 
+  useEffect(() => {
+    selectAllPartChoice()
+  }, [availablePartChoices])
+
   const updateQuestionInfo = (key: string, value: any) => {
     switch (key) {
       case 'description':
@@ -157,6 +161,14 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     else setAssociates([...associates, seq])
   }
 
+  const selectAllPartChoice = () => {
+    const arr = []
+    for (const c of availablePartChoices) {
+      arr.push(c.id as number)
+    }
+    setAssociates(arr)    
+  }
+
   const onSubmit = async () => {
     question.partId = props.part.id
     question.partChoices = associates
@@ -164,6 +176,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
     setLock(true)
     const res = await api.createQuestion(question)
     setLock(false)
+    selectAllPartChoice()
     if (!handleResult(res, false)) return
 
     // upload images
@@ -175,7 +188,6 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
 
     dropQuestion()
     props.update(res.data.question)
-    setAssociates([])
   }
 
   const validate = () => {
@@ -234,7 +246,7 @@ export const CreateQuestion: React.FC<CreateQuestionProps> = (props) => {
               {
                 availablePartChoices &&
                 availablePartChoices.map((c: any) => (
-                  <span key={c.id}> { c.alpha } <Checkbox defaultChecked={false} onChange={(e: any) => updateAssociatedPartChoice(c.id, e.target.checked)} />  &nbsp; &nbsp; &nbsp; </span>
+                  <span key={c.id}> { c.alpha } <Checkbox checked={associates.includes(c.id)} onChange={(e: any) => updateAssociatedPartChoice(c.id, e.target.checked)} />  &nbsp; &nbsp; &nbsp; </span>
                 ))
               }
             </div>

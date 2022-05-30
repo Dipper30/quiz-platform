@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     history_id: DataTypes.INTEGER
   }, {
     sequelize,
+    timestamps: false,
     modelName: 'Record',
   });
   return Record;

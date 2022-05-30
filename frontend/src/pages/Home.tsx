@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { handleResult, successMessage } from '../utils'
+import { errorMessage, handleResult, successMessage } from '../utils'
 import api from '../http'
 import QuizAbstract from '../components/admin/QuizAbstract'
 import { useNavigate } from 'react-router-dom'
@@ -20,7 +20,7 @@ const Home: React.FC<any> = (props: any) => {
     if (!handleResult(res, false)) return
     const { data } = res
     data.quizzes.length && getQuizById(data.quizzes[0].id)
-    setQuizzes(data.quizzes)
+    data.quizzes.length && setQuizzes(data.quizzes)
   }
 
   const enterQuiz = async (id?: number) => {
@@ -29,7 +29,10 @@ const Home: React.FC<any> = (props: any) => {
     } else if (quizzes.length) {
       const qid = quizzes[0].id
       navigate(`quiz/${qid}`)
-    } else return
+    } else {
+      errorMessage('No quiz available!')
+      return
+    }
   }
 
   const getQuizById = async (qid: number) => {
@@ -37,18 +40,6 @@ const Home: React.FC<any> = (props: any) => {
     if (!handleResult(res, false)) return
     setQuiz(res.data.quiz)
   }
-
-  const quizList = quizzes.map((quiz) => (
-    <QuizAbstract
-      key={quiz.id}
-      quiz={quiz}
-      clickable={true}
-      withDomain={false}
-      withButton={false}
-      withTag={false}
-      onQuizDetail={() => enterQuiz(quiz.id)}
-    />
-  ))
 
   return (
     <div className='home-container'>
@@ -69,9 +60,6 @@ const Home: React.FC<any> = (props: any) => {
       <br />
 
       <MyButton style='right' onClick={() => enterQuiz()}> START </MyButton>
-      {/* <div>
-        { quizList }
-      </div> */}
     </div>
   )
 }

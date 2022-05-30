@@ -22,7 +22,7 @@ const Quiz: React.FC<QuizProps> = (props) => {
     getQuizzesInfo()
   }, [])
 
-  const quizList = quizzes.map(quiz => (
+  const quizList = quizzes?.map(quiz => (
     <QuizAbstract
       clickable={true}
       key={quiz.id}
@@ -32,7 +32,7 @@ const Quiz: React.FC<QuizProps> = (props) => {
       withTag={true}
       update={getQuizzesInfo}
     />
-  ))
+  )) || []
 
   return (
     <div className='admin-quiz-container'>
