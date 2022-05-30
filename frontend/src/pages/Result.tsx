@@ -51,7 +51,7 @@ const Result: React.FC<ResultProps> = (props) => {
     const values: number[] = []
     for (const score of scores) {
       indicator.push({ name: score.name, max: 100 })
-      values.push(score.value)
+      values.push(Math.round(score.value))
     }
     const option: EChartsOption = {
       radar: {
@@ -61,6 +61,9 @@ const Result: React.FC<ResultProps> = (props) => {
         {
           type: 'radar',
           data: [ { value: values }],
+          label: {
+            show: true,
+          },
         },
       ],
     }

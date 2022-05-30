@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { choiceSeq } from '../config/choices'
 import { SubmissionChoice } from '../pages/Quiz'
 import { deepClone } from '../utils'
-import { Checkbox } from 'antd'
+import { Checkbox, Radio, Tag } from 'antd'
 import './Question.less'
 
 type QuestionProps = {
@@ -61,9 +61,7 @@ const Question: React.FC<QuestionProps> = (props) => {
         { props.question?.description ||
           `In this part, we will focus on ${props.question.name}.`
         }
-        { props.question.isMulti &&
-          <span> Multiple choices </span>
-        }
+          { props.question.is_multi ? <Tag color='green'> You may select more than one choice. </Tag> : '' }
       </div>
       { props.question.imgList && (
         <div className='img-container'>
@@ -81,10 +79,17 @@ const Question: React.FC<QuestionProps> = (props) => {
         {
           props.question.choices.map((c: ChoiceType, index: number) => (
             <div key={c.id} className='choice-container'>
-              <Checkbox
-                checked={props.isSubQuestion ? props.currentSelected?.includes(Number(c.id)) : selectedPartChoices.includes(Number(c.id))}
-                onClick={() => toggleSelected(Number(c.id))}
-              />
+              { props.question.is_multi ?
+                (<Checkbox
+                  checked={props.isSubQuestion ? props.currentSelected?.includes(Number(c.id)) : selectedPartChoices.includes(Number(c.id))}
+                  onClick={() => toggleSelected(Number(c.id))}
+                />) :
+                (<Radio
+                  checked={props.isSubQuestion ? props.currentSelected?.includes(Number(c.id)) : selectedPartChoices.includes(Number(c.id))}
+                  onClick={() => toggleSelected(Number(c.id))}
+                />)
+              }
+              
               <div
                 key={c.id}
                 className='choice'

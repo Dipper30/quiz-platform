@@ -1,4 +1,4 @@
-import { Tag, Button } from 'antd'
+import { Tag, Button, Popover } from 'antd'
 import api from '../../http'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { handleResult, warningMessage } from '../../utils'
@@ -19,6 +19,7 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
   const location = useLocation()
   const navagate = useNavigate()
   const [lock, setLock] = useState<boolean>(false)
+  const [visible, setVisible] = useState<boolean>(false)
 
   const onQuizDetail = () => {
     props.clickable && navagate(`/admin/quiz/${props.quiz.id}`)
@@ -63,6 +64,19 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
     // if (!handleResult(downloaded)) return
   }
 
+  const onDeleteTip = (e: any) => {
+    e && e.stopPropagation()
+  }
+
+  const onDeleteCancelled = (e: any) => {
+    e && e.stopPropagation()
+    setVisible(false)
+  }
+
+  const handleVisibleChange = (v: boolean) => {
+    setVisible(v)
+  }
+
   return (
     <div
       className={`admin-quiz-abstract-container
@@ -79,7 +93,21 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
           <div className='btn-group'>
             <Button className='btn' onClick={getRecord}> Download CSV </Button>
             <Button className='btn' onClick={toggleVisibility}> Toggle Visibility </Button>
-            <Button danger className='btn' onClick={onDelete}> Delete </Button>
+            <Popover
+              content={(
+                <div>
+                  <Button onClick={onDeleteCancelled}> No </Button>
+                  <Button danger className='btn' onClick={onDelete}> Yes </Button>
+                </div>
+              )}
+              title='Are you sure to delete this quiz?'
+              trigger="click"
+              visible={visible}
+              onVisibleChange={handleVisibleChange}
+            >
+              <Button danger onClick={onDeleteTip}>Delete</Button>
+            </Popover>
+            
           </div>
         }
       </div>

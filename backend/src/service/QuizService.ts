@@ -776,12 +776,12 @@ class Quiz extends BaseService {
       for (const hid of historyIdList) {
         const record = await this.calculateScore(hid)
         if (!record) break
-        line = this.generateScoreLine(record)
+        line = this.generateScoreLine(record, hid)
         if (!headers) {
           const len = line.split(',').length
-          for (let i = 0; i < len; i++) {
-            if (i === 0) headers += 'Q' + (i + 1)
-            else headers += ',Q' + (i + 1)
+          headers = 'hid'
+          for (let i = 1; i < len; i++) {
+            headers += ',Q' + i
           }
           data += headers + '\n'
         }
@@ -796,26 +796,20 @@ class Quiz extends BaseService {
     }
   }
 
-  generateScoreLine (score: any) {
+  generateScoreLine (score: any, hid: number) {
     if (!score) return ''
-    let line = ''
+    let line = `${hid}`
     for (const section of score.sections) {
       for (const domain of section.domains) {
         for (const part of domain.parts) {
           for (let index = 0; index < part.questions.length; index++) {
             const score = part.questions[index]?.score ? 1 : 0
-
-            if (!line) line += score
-            else line += (',' + score)
+            line += (',' + score)
           }
         }
       }
     }
     return line
-  }
-
-  async getOverAllScore (qid: number, hid: number) {
-    
   }
 
   findMaxSeq (arr: any[]): number {

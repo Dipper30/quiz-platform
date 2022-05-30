@@ -261,7 +261,7 @@ class Quiz extends BaseController {
       const hid = historyId
       const outputFileName = `r/output${qid}.csv`
 
-      const line = await QuizService.generateScoreLine(quiz)
+      const line = await QuizService.generateScoreLine(quiz, hid)
       if (line && !isError(line)) {
         fs.appendFileSync(outputFileName, line + '\n')
       }
@@ -273,7 +273,7 @@ class Quiz extends BaseController {
 
       const exec = require('child_process').exec
 
-      exec(`rscript r/score.R r/output${qid}.csv`, (error: any, stdout: string, stderr: string) => {
+      exec(`rscript r/score.R r/output${qid}.csv ${historyId}`, (error: any, stdout: string, stderr: string) => {
         console.log({ error, stdout, stderr })
        
         if (error) {
