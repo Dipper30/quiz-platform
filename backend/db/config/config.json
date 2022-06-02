@@ -18,9 +18,9 @@
   },
   "production": {
     "username": "admin",
-    "password": "..",
-    "database": "quiz-db",
-    "host": "..",
+    "password": "db123456",
+    "database": "aptx4868",
+    "host": "db.chqoyv7zkx75.us-east-2.rds.amazonaws.com",
     "dialect": "mysql"
   }
 }

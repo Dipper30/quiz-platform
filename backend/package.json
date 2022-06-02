@@ -5,6 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "dev": "export NODE_ENV=development && nodemon src/app.ts",
+    "prod": "export NODE_ENV=production && nodemon src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
