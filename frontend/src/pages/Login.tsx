@@ -54,20 +54,18 @@ const Login: React.FC = (props: any) => {
   return (
     <>
       <div className='login-container'>
-        {/* {user?.username || 'no'} */}
         <div className='title'>Login</div>
         <div className='row'>
           <div className='label'>Username</div>
           <input autoFocus onKeyDown={handleEnterKeyDown} placeholder='Type username...' onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUsername(e.target.value)} />
-          <span className='count'>{password.length} / 12</span>
+          <span className='count'>{username.length} / 12</span>
         </div>
         <div className='row'>
           <div className='label'>Password</div>
           <input onKeyDown={handleEnterKeyDown} type={'password'} placeholder='Type password...' onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
           <span className='count'>{password.length} / 18</span>
         </div>
-        <div className='desc'> Account will automatically be created for a new user.</div>
-        <button onClick={login}> {'Go'} </button>
+        <button onClick={login}> Sign In </button>
       </div>
     </>
   )
