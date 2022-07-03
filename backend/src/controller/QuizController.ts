@@ -329,8 +329,7 @@ class Quiz extends BaseController {
   /**
    * get csv file by quiz id
    */
-  async getScoreCSVDataByQuizId (req: any, res: any, next: any): Promise<any> {
- 
+  async getCSVFileOfScoreRecords (req: any, res: any, next: any): Promise<any> {
     try {
       
       const { id } = req.params // quiz id
@@ -346,6 +345,28 @@ class Quiz extends BaseController {
         }
       })
 
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  /**
+   * detailed csv file with choices of each question
+   */
+  async getCSVFileOfDetailedScoreRecords (req: any, res: any, next: any): Promise<any> {
+    try {
+      const { id } = req.params // quiz id
+      if (!id) throw new ParameterException()
+      const init = await QuizService.generateDetailedCSVFileByQuizId(id)
+      if (isError(init)) throw init
+
+      res.sendFile(`detailed_records_${id}.csv`, { root: 'r' }, function (err: any, data: any) {
+        if (err) {
+          res.writeHead(404)
+          res.end(JSON.stringify(err))
+          return
+        }
+      })
     } catch (error) {
       next(error)
     }

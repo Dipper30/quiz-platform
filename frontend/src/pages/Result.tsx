@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import * as echarts from 'echarts'
 import './Result.less'
 
-type EChartsOption = echarts.EChartsOption;
+type EChartsOption = echarts.EChartsOption
 
 type Recommendation = {
   id: number,
@@ -35,7 +35,6 @@ const Result: React.FC<ResultProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    // const { quiz } = location.state
     if (!loading && !result) {
       navigate('/')
       return
@@ -50,7 +49,7 @@ const Result: React.FC<ResultProps> = (props) => {
     const indicator : any = []
     const values: number[] = []
     for (const score of scores) {
-      indicator.push({ name: score.name, max: 100 })
+      indicator.push({ name: score.name, max: 100, color: '#333' })
       values.push(Math.round(score.value))
     }
     const option: EChartsOption = {

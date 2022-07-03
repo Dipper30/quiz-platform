@@ -51,7 +51,10 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
     props.update && props.update()
   }
 
-  const getRecord = async (e: any) => {
+  /**
+   * download a csv file
+   */
+  const getRecords = async (e: any) => {
     e && e.stopPropagation()
     if (lock) {
       warningMessage('Wait a Sec')
@@ -62,6 +65,18 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
     window.open(path, '_blank')
     setLock(false)
     // if (!handleResult(downloaded)) return
+  }
+
+  const getDetailedRecords = async (e: any) => {
+    e && e.stopPropagation()
+    if (lock) {
+      warningMessage('Wait a Sec')
+      return
+    }
+    setLock(true)
+    const path = apiBaseURL + '/detailedRecords/' + props.quiz.id
+    window.open(path, '_blank')
+    setLock(false)
   }
 
   const onDeleteTip = (e: any) => {
@@ -91,7 +106,8 @@ const QuizAbstract: React.FC<QuizAbstractProps> = (props) => {
         { props.withTag && props.quiz.tag && <Tag color='geekblue'> { props.quiz.tag } </Tag> }
         { props.withButton &&
           <div className='btn-group'>
-            <Button className='btn' onClick={getRecord}> Download CSV </Button>
+            <Button className='btn' onClick={getRecords}> Download Records </Button>
+            <Button className='btn' onClick={getDetailedRecords}> Download Detailed Records </Button>
             <Button className='btn' onClick={toggleVisibility}> Toggle Visibility </Button>
             <Popover
               content={(

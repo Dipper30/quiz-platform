@@ -656,7 +656,6 @@ class Quiz extends BaseService {
             const partRecordModel = await PartRecordModel.findAll({
               where: { history_id: hid, part_id: part.id }
             })
-            // console.log(partRecordModel)
             if (!partRecordModel || partRecordModel.length == 0) throw new QuizException(errCode.QUIZ_ERROR, 'No Part Record Found.')
             part.partRecord = partRecordModel[0].partchoice_id // part choice selected by user
             
@@ -758,7 +757,7 @@ class Quiz extends BaseService {
    * write score data to csv file according to quiz id
    */
   async initCSVFileByQuizId (qid: number) {
-    const outputFileName = `r/output${qid}.csv`
+    const outputFileName = `r/score_${qid}.csv`
     // clear file if already exists
     if (fs.existsSync(outputFileName)) {
       await fs.writeFileSync(outputFileName, '')
@@ -796,6 +795,52 @@ class Quiz extends BaseService {
     }
   }
 
+  async generateDetailedCSVFileByQuizId (qid: number) {
+    const outputFileName = `r/detailed_records_${qid}.csv`
+    // clear file if already exists
+    if (fs.existsSync(outputFileName)) {
+      await fs.writeFileSync(outputFileName, '')
+    }
+    const fileCreated = await FileService.mkDirRecursive(outputFileName)
+    if (!fileCreated) throw new QuizException(errCode.QUIZ_ERROR, 'File Not Created')
+    try {
+      const historyIdList = await this.findAllHistoriesByQuizId(qid)
+      if (isError(historyIdList)) throw historyIdList
+
+      let data = ''
+      let headers = ''
+      let line = ''
+      // write to file by line
+      for (const hid of historyIdList) {
+        const record = await this.calculateScore(hid)
+        if (!record) break
+        const details = await this.generateDetailedScoreLine(record, hid)
+        line = details.line
+        if (!headers) {
+          const arr = line.split(',')
+          console.log('arr ', arr)
+          headers = 'hid'
+          for (let i = 1; i < arr.length; i++) {
+            if (i > details.questionCount) break
+            headers += ',Q' + i
+          }
+          headers += ',Overall Score'
+          for (const section of record.sections) {
+            headers += `,${section.title}`
+          }
+          data += headers + '\n'
+        }
+        data += line + '\n'
+        line = ''
+      }
+
+      fs.writeFileSync(outputFileName, data)
+      return true
+    } catch (error) {
+      return error
+    }
+  }
+
   generateScoreLine (score: any, hid: number) {
     if (!score) return ''
     let line = `${hid}`
@@ -810,6 +855,41 @@ class Quiz extends BaseService {
       }
     }
     return line
+  }
+
+  async generateDetailedScoreLine (score: any, hid: number) {
+    if (!score) return { line: '', questionCount: 0 }
+    let line = `${hid}`
+    const sequence = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
+    let questionCount = 0
+    for (const section of score.sections) {
+      for (const domain of section.domains) {
+        for (const part of domain.parts) {
+          for (let index = 0; index < part.questions.length; index++) {
+            // get choices from users
+            const q = part.questions[index]
+            const choiceModels = await RecordModel.findAll({
+              where:{
+                history_id: hid,
+                question_id: q.id,
+              }
+            })
+            let i = 0
+            let userChoices = ''
+            for (const c of choiceModels) {
+              userChoices += sequence[i++]
+            }
+            line += (',' + userChoices)
+            questionCount++
+          }
+        }
+      }
+    }
+    line += `,${score.score.toFixed(2)}`
+    for (const section of score.sections) {
+      line += `,${section.score.toFixed(2)}`
+    }
+    return { line, questionCount }
   }
 
   findMaxSeq (arr: any[]): number {
