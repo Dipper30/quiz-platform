@@ -1,4 +1,4 @@
-install.packages("ltm")
+install.packages("ltm", repos = "http://cran.us.r-project.org")
 library("ltm")
 args <- commandArgs()
 path <- args[6] # csv file name
