@@ -422,7 +422,7 @@ class Quiz extends BaseService {
             let sum = 0
             for (let qIndex = 0; qIndex < questionModels.length; qIndex++) {
               const qid = questionModels[qIndex].id
-              const total = await ChoiceModel.getTotalPointsByQuestionId(qid)
+              const total = await this.getTotalPointsByQuestionId(qid)
               sum += total
             }
             part.totalPoints = sum
@@ -446,6 +446,13 @@ class Quiz extends BaseService {
     } catch (error) {
       return error
     }
+  }
+
+  async getTotalPointsByQuestionId (id: number) {
+    const choices = await ChoiceModel.findAll({
+      where: { question_id: id },
+    })
+    return choices.reduce((prev: any, cur: any) => prev + cur.score, 0)
   }
 
   async getQuestions (data: { pid: Number, pcid: Number }, withScore: Boolean = false) {

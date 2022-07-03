@@ -14,12 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       Choice.belongsTo(models.Question, { foreignKey: 'question_id', targetKey: 'id' })
     }
 
-    static getTotalPointsByQuestionId = async function (id) {
-      const choices = await Choice.findAll({
-        where: { question_id: id },
-      })
-      return choices.reduce((prev, cur) => prev + cur.score, 0)
-    }
+    // static getTotalPointsByQuestionId = async function (id) {
+    //   const choices = await Choice.findAll({
+    //     where: { question_id: id },
+    //   })
+    //   return choices.reduce((prev, cur) => prev + cur.score, 0)
+    // }
 
   }
   Choice.init({
