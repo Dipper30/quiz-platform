@@ -7,6 +7,7 @@ import { setUser } from '../store/actions/user'
 import { connect } from 'react-redux'
 import { handleResult, setLocalStorage } from '../utils' 
 import { useNavigate } from 'react-router-dom'
+import { Button, Input } from 'antd'
 
 const Login: React.FC = (props: any) => {
   const [username, setUsername] = useState('')
@@ -63,9 +64,9 @@ const Login: React.FC = (props: any) => {
         <div className='row'>
           <div className='label'>Password</div>
           <input onKeyDown={handleEnterKeyDown} type={'password'} placeholder='Type password...' onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
-          <span className='count'>{password.length} / 18</span>
+          <span className='count'>{password.length} / 12</span>
         </div>
-        <button onClick={login}> Sign In </button>
+        <Button onClick={login}> Sign In </Button>
       </div>
     </>
   )
