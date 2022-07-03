@@ -764,7 +764,7 @@ class Quiz extends BaseService {
    * write score data to csv file according to quiz id
    */
   async initCSVFileByQuizId (qid: number) {
-    const outputFileName = `r/score_${qid}.csv`
+    const outputFileName = `r/output${qid}.csv`
     // clear file if already exists
     if (fs.existsSync(outputFileName)) {
       await fs.writeFileSync(outputFileName, '')

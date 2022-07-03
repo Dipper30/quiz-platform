@@ -1,3 +1,4 @@
+install.packages("ltm")
 library("ltm")
 args <- commandArgs()
 path <- args[6] # csv file name
