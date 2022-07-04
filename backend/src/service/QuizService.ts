@@ -5,7 +5,6 @@ import { ParameterException, QuizException } from '../exception'
 import { errCode } from '../config'
 import { isEmptyValue, isError, omitFields } from '../utils/tools'
 import fs from 'fs'
-import os from 'os'
 import FileService from './FileService'
 
 const models = require('../../db/models/index.js')
@@ -205,13 +204,6 @@ class Quiz extends BaseService {
 
       const newQuestion = questionModel.dataValues
       newQuestion.choices = []
-
-      // make sure the sequence number is unique
-      // const priorChoices = await ChoiceModel.findAll({
-      //   where: { part_id: partId, destroyed: false },
-      // })
-      // let choiceSeq = this.findMaxSeq(priorChoices) + 1
-
       let choiceSeq = 1
 
       for (let index = 0; index < choices.length; index++) {
@@ -289,33 +281,7 @@ class Quiz extends BaseService {
   }
 
   async createChoice (data: Choice) {
-    // try {
-    //   const { description, questionId, score } = data
-    //   const ifQuestionExists = await QuestionModel.findByPk(questionId)
-      
-    //   if (!ifQuestionExists) throw new QuizException(errCode.QUIZ_ERROR, 'Question does not exist.')
-
-    //   // make sure the sequence number is unique
-    //   const priorChoices = await ChoiceModel.findAll({
-    //     where: { question_id: questionId, destroyed: false },
-    //   })
-    //   if (priorChoices && priorChoices.find((c: any) => c.seq == seq)) {
-    //     throw new QuizException(errCode.QUIZ_ERROR, 'Duplicate Seq Number!')
-    //   }
-
-    //   const newChoice = await ChoiceModel.create({
-    //     description,
-    //     seq,
-    //     question_id: questionId,
-    //     destroyed: false,
-    //     score,
-    //   })
-
-    //   return omitFields(newChoice.dataValues, ['destroyed'], true)
-
-    // } catch (error) {
-    //   return error
-    // }
+ 
   }
 
   async updateChoice (data: Choice) {
@@ -331,12 +297,6 @@ class Quiz extends BaseService {
         choice.question_id = questionId
       }
 
-      // make sure the sequence number is unique
-      // const priorChoices = await ChoiceModel.findAll({
-      //   where: { part_id: partId, destroyed: false },
-      // })
-      // let choiceSeq = this.findMaxSeq(priorChoices) + 1
-      // make sure the sequence number is unique
       if (!isEmptyValue(seq)) {
         const priorChoices = await ChoiceModel.findAll({
           where: { question_id: choice.question_id, destroyed: false },
@@ -904,11 +864,33 @@ class Quiz extends BaseService {
         }
       }
     }
-    line += `,${score.score.toFixed(5)}`
+    
+    const overallScore = await this.getRscriptScore(score.id, hid)
+    
+    line += `,${(overallScore || 0).toFixed(5)}`
     for (const section of score.sections) {
       line += `,${(section.score || 0).toFixed(2)}`
     }
     return { line, questionCount }
+  }
+
+  /**
+   * get overallScore according to quiz id and history id
+   */
+  getRscriptScore (qid: number, hid: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const exec = require('child_process').exec
+      exec(`rscript r/score.R r/output${qid}.csv ${hid}`, (error: any, stdout: string, stderr: string) => {
+        if (error) {
+          resolve(0)
+        } else {
+          const re = /\s(\S+)/g
+          const arr = re.exec(stdout)
+          const overallScore = (arr && arr.length > 1) ? Number(arr[1]) : 0
+          resolve(Number(overallScore))
+        }
+      })
+    })
   }
 
   findMaxSeq (arr: any[]): number {

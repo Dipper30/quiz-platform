@@ -11,6 +11,8 @@ import FileService from '../service/FileService'
 import { Choice, InitQuiz, Question } from "../types"
 import { isEmptyValue, isError } from "../utils/tools"
 import BaseController from "./BaseController"
+const models = require('../../db/models/index.js')
+const { History: HistoryModel } = models
 
 class Quiz extends BaseController {
 
@@ -273,7 +275,7 @@ class Quiz extends BaseController {
 
       const exec = require('child_process').exec
 
-      exec(`rscript r/score.R r/output${qid}.csv ${historyId}`, (error: any, stdout: string, stderr: string) => {
+      exec(`rscript r/score.R r/output${qid}.csv ${historyId}`, async (error: any, stdout: string, stderr: string) => {
         console.log({ error, stdout, stderr })
        
         if (error) {
@@ -287,6 +289,11 @@ class Quiz extends BaseController {
               quiz,
             }
           })
+          const history = await HistoryModel.findByPk(historyId)
+          if (history) {
+            history.overallScore = '0'
+            await history.save()
+          }
         } else {
           const re = /\s(\S+)/g
           const arr = re.exec(stdout)
@@ -300,6 +307,11 @@ class Quiz extends BaseController {
               quiz,
             },
           })
+          const history = await HistoryModel.findByPk(historyId)
+          if (history) {
+            history.overallScore = score
+            await history.save()
+          }
         }
       })
     } catch (error) {
