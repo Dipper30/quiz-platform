@@ -15,13 +15,6 @@ data <- read.csv(path, sep=',')
 ID <- data[[1]]
 hid <- as.numeric(arg7)
 cnt <- 1
-index <- cnt
-while (cnt <= length(ID)) {
-  if (ID[cnt] == hid) {
-    index <- cnt
-  }
-  cnt = cnt + 1
-}
 
 dataWithoutID <- data[-1]
 
