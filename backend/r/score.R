@@ -29,4 +29,15 @@ res_2pl <- ltm(dataWithoutID ~ z1)
 pp_eap <- factor.scores(res_2pl, method = "EAP", resp.patterns = dataWithoutID)
 EAP <- pp_eap$score.dat$z1
 
-print(EAP[index])
+if (hid == '-1') {
+  print(EAP)
+} else {
+  index <- cnt
+  while (cnt <= length(ID)) {
+    if (ID[cnt] == hid) {
+      index <- cnt
+    }
+    cnt = cnt + 1
+  }
+  print(EAP[index])
+}

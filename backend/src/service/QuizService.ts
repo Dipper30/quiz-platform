@@ -770,6 +770,9 @@ class Quiz extends BaseService {
     }
     const fileCreated = await FileService.mkDirRecursive(outputFileName)
     if (!fileCreated) throw new QuizException(errCode.QUIZ_ERROR, 'File Not Created')
+
+    const overallScore = await this.getAllOverallScore(qid)
+    let i = 0
     try {
       const historyIdList = await this.findAllHistoriesByQuizId(qid)
       if (isError(historyIdList)) throw historyIdList
@@ -781,6 +784,7 @@ class Quiz extends BaseService {
       for (const hid of historyIdList) {
         const record = await this.calculateScore(hid)
         if (!record) break
+        record.overallScore = overallScore.length >= i ? overallScore[i++] : 0
         const details = await this.generateDetailedScoreLine(record, hid)
         line = details.line
         if (!headers) {
@@ -865,9 +869,7 @@ class Quiz extends BaseService {
       }
     }
     
-    const overallScore = await this.getRscriptScore(score.id, hid)
-    
-    line += `,${(overallScore || 0).toFixed(5)}`
+    line += `,${(score.overallScore || 0).toFixed(5)}`
     for (const section of score.sections) {
       line += `,${(section.score || 0).toFixed(2)}`
     }
@@ -875,19 +877,17 @@ class Quiz extends BaseService {
   }
 
   /**
-   * get overallScore according to quiz id and history id
+   * get all overall scores according to quiz id
    */
-  getRscriptScore (qid: number, hid: number): Promise<number> {
+  getAllOverallScore (qid: number): Promise<number[]> {
     return new Promise((resolve, reject) => {
       const exec = require('child_process').exec
-      exec(`rscript r/score.R r/output${qid}.csv ${hid}`, (error: any, stdout: string, stderr: string) => {
+      exec(`rscript r/score.R r/output${qid}.csv -1`, (error: any, stdout: string, stderr: string) => {
         if (error) {
-          resolve(0)
+          resolve([])
         } else {
-          const re = /\s(\S+)/g
-          const arr = re.exec(stdout)
-          const overallScore = (arr && arr.length > 1) ? Number(arr[1]) : 0
-          resolve(Number(overallScore))
+          const arr = stdout.replace(/\[\S+\]/g, '').split(' ').filter(v => v != '').map(v => Number(v))
+          resolve(arr)
         }
       })
     })
