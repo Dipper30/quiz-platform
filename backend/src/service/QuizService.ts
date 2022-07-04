@@ -875,16 +875,28 @@ class Quiz extends BaseService {
           for (let index = 0; index < part.questions.length; index++) {
             // get choices from users
             const q = part.questions[index]
-            const choiceModels = await RecordModel.findAll({
+            const recordModel = await RecordModel.findOne({
               where:{
                 history_id: hid,
                 question_id: q.id,
               }
             })
-            let i = 0
+            const questionChoiceModels = await ChoiceModel.findAll({
+              where: {
+                question_id: q.id,
+              }
+            })
+            
             let userChoices = ''
-            for (const c of choiceModels) {
-              userChoices += sequence[i++]
+            if (recordModel) {
+              const userChoiceRecords = recordModel.dataValues.choice_id.split(',').map((n: any) => Number(n))
+              for (const cid of userChoiceRecords) {
+                let i = 0
+                for (const questionChoice of questionChoiceModels) {
+                  if (cid == questionChoice.id) userChoices += sequence[i]
+                  i++
+                }
+              }
             }
             line += (',' + userChoices)
             questionCount++
@@ -892,9 +904,9 @@ class Quiz extends BaseService {
         }
       }
     }
-    line += `,${score.score.toFixed(2)}`
+    line += `,${score.score.toFixed(5)}`
     for (const section of score.sections) {
-      line += `,${section.score.toFixed(2)}`
+      line += `,${(section.score || 0).toFixed(2)}`
     }
     return { line, questionCount }
   }

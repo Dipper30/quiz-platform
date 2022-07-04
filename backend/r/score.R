@@ -1,5 +1,12 @@
-install.packages("ltm", repos = "http://cran.us.r-project.org")
+# install packages and defineing their repo sources
+# install.packages("ltm", repos = "http://cran.us.r-project.org")
+# install.packages("polycor", repos = "http://cran.us.r-project.org")
+# install.packages("msm", repos = "http://cran.us.r-project.org")
+# install.packages("MASS", repos = "http://cran.us.r-project.org")
 library("ltm")
+library("polycor")
+library("msm")
+library("MASS")
 args <- commandArgs()
 path <- args[6] # csv file name
 arg7 <- args[7] # history id
