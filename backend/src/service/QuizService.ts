@@ -90,21 +90,36 @@ class Quiz extends BaseService {
 
             // append choices and recommendaitons
             const { choices, recommendations } = part
-            await PartChoiceModel.bulkCreate(
-              choices.map(choice => ({
+            for (const choice of choices) {
+              await PartChoiceModel.create({
                 description: choice.description,
                 show_sub: choice.willShowSubQuestions,
                 seq: choice.seq,
-                part_id: partId
-              })), { transaction: t }
-            )
-            await RecommendationModel.bulkCreate(
-              recommendations.map(recommendation => ({
+                part_id: partId,
+              }, { transaction: t })
+            }
+            for (const recommendation of recommendations) {
+              await RecommendationModel.create({
                 show_under: recommendation.showUnder,
                 link: recommendation.link,
                 part_id: partId,
-              })), { transaction: t }
-            )
+              }, { transaction: t })
+            }
+            // await PartChoiceModel.bulkCreate(
+            //   choices.map(choice => ({
+            //     description: choice.description,
+            //     show_sub: choice.willShowSubQuestions,
+            //     seq: choice.seq,
+            //     part_id: partId
+            //   })), { transaction: t }
+            // )
+            // await RecommendationModel.bulkCreate(
+            //   recommendations.map(recommendation => ({
+            //     show_under: recommendation.showUnder,
+            //     link: recommendation.link,
+            //     part_id: partId,
+            //   })), { transaction: t }
+            // )
 
           }
         }
@@ -175,7 +190,7 @@ class Quiz extends BaseService {
     try {
       const { description, isMulti, partId, partChoices, imgSrc, choices } = data
 
-      const ifExists = await PartChoiceModel.findByPk(partId)
+      const ifExists = await PartModel.findByPk(partId)
       if (!ifExists) throw new QuizException(errCode.QUIZ_ERROR, 'Part does not exist.')
 
       // make sure the sequence number is unique

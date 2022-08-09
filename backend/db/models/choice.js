@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
     destroyed: DataTypes.BOOLEAN,
   }, {
     sequelize,
-    timestamps: false,
+    // timestamps: false,
     modelName: 'Choice',
   });
   // Choice.getTotalPointsByQuestionId = async function (id) {

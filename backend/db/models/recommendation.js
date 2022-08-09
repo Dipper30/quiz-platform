@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     part_id: DataTypes.INTEGER
   }, {
     sequelize,
-    timestamps: false,
+    // timestamps: false,
     modelName: 'Recommendation',
   });
   return Recommendation;

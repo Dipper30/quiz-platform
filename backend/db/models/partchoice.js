@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     part_id: DataTypes.INTEGER
   }, {
     sequelize,
-    timestamps: false,
+    // timestamps: false,
     modelName: 'PartChoice',
   });
   return PartChoice;

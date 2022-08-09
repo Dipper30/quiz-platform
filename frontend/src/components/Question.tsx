@@ -1,6 +1,7 @@
+/* eslint-disable react/jsx-no-target-blank */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable react/no-array-index-key */
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { choiceSeq } from '../config/choices'
 import { SubmissionChoice } from '../pages/Quiz'
 import { deepClone } from '../utils'
@@ -20,10 +21,16 @@ const Question: React.FC<QuestionProps> = (props) => {
   const [selectedPartChoices, setSelectedPartChoices] = useState<number[]>([])
   const [largeImgVisible, setLargeImgVisible] = useState<boolean>(false)
   const [currentImgSrc, setCurrentImgSrc] = useState<string>('')
+  const desc = useRef<any>()
 
   useEffect(() => {
     props.update({ qid: Number(props.question.id), cid: selectedPartChoices })
   }, [selectedPartChoices])
+
+  useEffect(() => {
+    console.log('wtf ', props.question.description)
+    desc.current.innerHTML = props.question.description ? props.question.description : `In this part, we will focus on ${props.question.name}.`
+  }, [props.question.description])
 
   const toggleSelected = (id: number) => {
     let hasRecord = false
@@ -58,10 +65,8 @@ const Question: React.FC<QuestionProps> = (props) => {
       }
 
       <div className='description'>
-        { props.question?.description ||
-          `In this part, we will focus on ${props.question.name}.`
-        }
-          { props.question.is_multi ? <Tag color='green'> You may select more than one choice. </Tag> : '' }
+        <div className='plain-text' ref={desc}> </div>
+        { props.question.is_multi ? <Tag color='green'> You may select more than one choice. </Tag> : '' }
       </div>
       { props.question.imgList && (
         <div className='img-container'>

@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     partchoice_id: DataTypes.INTEGER
   }, {
     sequelize,
-    timestamps: false,
+    // timestamps: false,
     modelName: 'PartRecord',
   });
   return PartRecord;
