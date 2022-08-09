@@ -11,6 +11,9 @@ module.exports = {
       quiz_id: {
         type: Sequelize.INTEGER
       },
+      overallScore: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

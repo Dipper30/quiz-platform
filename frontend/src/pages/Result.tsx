@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { lazy, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
-import * as echarts from 'echarts'
 import './Result.less'
 
 type EChartsOption = echarts.EChartsOption
@@ -30,8 +29,10 @@ const Result: React.FC<ResultProps> = (props) => {
       navigate('/')
       return
     }
-    const chart = echarts.init(document.getElementById('radar') as HTMLElement)
-    setRadarChart(chart)
+    import('echarts').then(res => {
+      const chart = res.init(document.getElementById('radar') as HTMLElement)
+      setRadarChart(chart)
+    })
   }, [])
 
   useEffect(() => {

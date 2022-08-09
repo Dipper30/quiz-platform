@@ -28,7 +28,6 @@ const Question: React.FC<QuestionProps> = (props) => {
   }, [selectedPartChoices])
 
   useEffect(() => {
-    console.log('wtf ', props.question.description)
     desc.current.innerHTML = props.question.description ? props.question.description : `In this part, we will focus on ${props.question.name}.`
   }, [props.question.description])
 
