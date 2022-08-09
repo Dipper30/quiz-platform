@@ -88,7 +88,7 @@ const Result: React.FC<ResultProps> = (props) => {
 
   useEffect(() => {
     (chartOptions && radarChart) && radarChart.setOption(chartOptions)
-  }, [chartOptions])
+  }, [chartOptions, radarChart])
 
   const directTo = (link: string) => {
     window.open(link, '_blank')
@@ -106,7 +106,9 @@ const Result: React.FC<ResultProps> = (props) => {
       </div>
       <span className='divider'></span>
       <p className='text'> Your Score in Each Pivot </p>
-      <div id='radar'></div>
+      <div id='radar'>
+        Rendering Radar E-Chart...
+      </div>
       <span className='divider'></span>
       <p className='text'> Relevant resources that might be helpful</p>
       <div className='recommendation-list'>

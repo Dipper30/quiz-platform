@@ -581,9 +581,7 @@ class Quiz extends BaseService {
 
   async calculateScore (hid: number) {
     try {
-      console.log(111, hid)
       const history = await HistoryModel.findByPk(hid)
-      console.log(222, history)
       if (!history) throw new QuizException()
       const quizId = history.quiz_id
       const quiz: any = {}
@@ -805,7 +803,6 @@ class Quiz extends BaseService {
         line = details.line
         if (!headers) {
           const arr = line.split(',')
-          console.log('arr ', arr)
           headers = 'hid'
           for (let i = 1; i < arr.length; i++) {
             if (i > details.questionCount) break
@@ -830,7 +827,6 @@ class Quiz extends BaseService {
 
   generateScoreLine (score: any, hid: number) {
     if (!score) return ''
-    console.log(333, score)
     let line = `${hid}`
     for (const section of score.sections) {
       for (const domain of section.domains) {
